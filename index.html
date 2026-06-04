@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minecraft Texture Maker</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header>
+    <h1>Minecraft Texture Maker</h1>
+  </header>
+
+  <main>
+    <section class="sidebar-left">
+      <div class="tool-section">
+        <h2>Tools</h2>
+        <div class="tool-buttons">
+          <button class="tool-btn active" data-tool="pencil" title="Pencil">
+            <span class="tool-icon">&#9998;</span>
+            <span class="tool-label">Draw</span>
+          </button>
+          <button class="tool-btn" data-tool="eraser" title="Eraser">
+            <span class="tool-icon">&#9746;</span>
+            <span class="tool-label">Erase</span>
+          </button>
+          <button class="tool-btn" data-tool="fill" title="Fill Bucket">
+            <span class="tool-icon">&#9832;</span>
+            <span class="tool-label">Fill</span>
+          </button>
+          <button class="tool-btn" data-tool="picker" title="Color Picker">
+            <span class="tool-icon">&#128270;</span>
+            <span class="tool-label">Pick</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="color-section">
+        <h2>Colors</h2>
+        <div class="current-color-display">
+          <div id="current-color" style="background-color: #000000;"></div>
+          <span id="current-color-label">#000000</span>
+        </div>
+        <div id="color-palette" class="color-palette"></div>
+        <input type="color" id="custom-color" value="#000000" title="Pick any color">
+      </div>
+
+      <div class="size-section">
+        <h2>Canvas Size</h2>
+        <div class="size-buttons">
+          <button class="size-btn active" data-size="16">16x16</button>
+          <button class="size-btn" data-size="32">32x32</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="editor-area">
+      <div class="canvas-wrapper">
+        <canvas id="pixel-canvas" width="512" height="512"></canvas>
+        <canvas id="grid-canvas" width="512" height="512"></canvas>
+      </div>
+      <div class="editor-controls">
+        <button id="btn-undo" class="control-btn" title="Undo">Undo</button>
+        <button id="btn-redo" class="control-btn" title="Redo">Redo</button>
+        <button id="btn-clear" class="control-btn" title="Clear Canvas">Clear</button>
+        <label class="grid-toggle">
+          <input type="checkbox" id="show-grid" checked>
+          Show Grid
+        </label>
+      </div>
+    </section>
+
+    <section class="sidebar-right">
+      <div class="template-section">
+        <h2>Start From</h2>
+        <div id="template-list" class="template-list"></div>
+      </div>
+
+      <div class="preview-section">
+        <h2>Preview</h2>
+        <canvas id="preview-canvas" width="192" height="192"></canvas>
+      </div>
+
+      <div class="pack-section">
+        <h2>Your Pack</h2>
+        <input type="text" id="pack-name" placeholder="My Cool Pack" maxlength="32">
+        <div id="pack-textures" class="pack-textures"></div>
+        <div class="texture-target">
+          <label for="texture-target-select">This texture is for:</label>
+          <select id="texture-target-select"></select>
+        </div>
+        <button id="btn-add-to-pack" class="action-btn">Add to Pack</button>
+        <button id="btn-download" class="action-btn download-btn">Download Pack!</button>
+      </div>
+
+      <div class="help-section">
+        <h2>How to Use Your Pack</h2>
+        <button id="btn-toggle-help" class="help-toggle-btn">Show Me How!</button>
+        <div id="help-steps" class="help-steps hidden">
+          <div class="help-step">
+            <div class="step-number">1</div>
+            <div class="step-text">
+              <strong>Draw your texture!</strong>
+              Pick a color on the left and draw on the big grid in the middle. You can also click a block on the right to start from that shape.
+            </div>
+          </div>
+          <div class="help-step">
+            <div class="step-number">2</div>
+            <div class="step-text">
+              <strong>Pick what block it replaces</strong>
+              Use the "This texture is for" dropdown above to choose which Minecraft block or item your drawing will replace (like Dirt or Stone).
+            </div>
+          </div>
+          <div class="help-step">
+            <div class="step-number">3</div>
+            <div class="step-text">
+              <strong>Click "Add to Pack"</strong>
+              This saves your texture into your pack. You can make as many textures as you want! They all show up as little pictures above the button.
+            </div>
+          </div>
+          <div class="help-step">
+            <div class="step-number">4</div>
+            <div class="step-text">
+              <strong>Name your pack</strong>
+              Type a cool name in the "My Cool Pack" box. This is what it will be called in Minecraft!
+            </div>
+          </div>
+          <div class="help-step">
+            <div class="step-number">5</div>
+            <div class="step-text">
+              <strong>Click "Download Pack!"</strong>
+              This downloads a .zip file to your computer. Remember where it saves!
+            </div>
+          </div>
+          <div class="help-divider">
+            Now let's put it in Minecraft!
+          </div>
+          <div class="help-step">
+            <div class="step-number">6</div>
+            <div class="step-text">
+              <strong>Open Minecraft Java Edition</strong>
+              Go to the main menu and click <span class="mc-btn">Options...</span>
+            </div>
+          </div>
+          <div class="help-step">
+            <div class="step-number">7</div>
+            <div class="step-text">
+              <strong>Click "Resource Packs..."</strong>
+              You'll see a screen with two columns. Your pack isn't there yet!
+            </div>
+          </div>
+          <div class="help-step">
+            <div class="step-number">8</div>
+            <div class="step-text">
+              <strong>Click "Open Pack Folder"</strong>
+              This opens a folder on your computer called <span class="mc-path">resourcepacks</span>.
+            </div>
+          </div>
+          <div class="help-step">
+            <div class="step-number">9</div>
+            <div class="step-text">
+              <strong>Drag your .zip file into that folder</strong>
+              Find the .zip file you downloaded and drag it right into the resourcepacks folder.
+            </div>
+          </div>
+          <div class="help-step">
+            <div class="step-number">10</div>
+            <div class="step-text">
+              <strong>Go back to Minecraft and click your pack!</strong>
+              Your pack should now appear on the left side. Click the arrow to move it to "Selected" on the right side. Click <span class="mc-btn">Done</span> and your textures are in the game!
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
