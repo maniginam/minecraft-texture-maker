@@ -58,6 +58,42 @@ export const TEMPLATES = {
     mcPath: 'assets/minecraft/textures/block/diamond_ore.png',
     pixels: generateDiamondOre(),
   },
+  diamond_sword: {
+    name: 'Sword',
+    category: 'items',
+    mcPath: 'assets/minecraft/textures/item/diamond_sword.png',
+    pixels: generateSword('#2CB8C5', '#5DECF5'),
+  },
+  diamond_pickaxe: {
+    name: 'Pickaxe',
+    category: 'items',
+    mcPath: 'assets/minecraft/textures/item/diamond_pickaxe.png',
+    pixels: generatePickaxe('#2CB8C5', '#5DECF5'),
+  },
+  diamond_axe: {
+    name: 'Axe',
+    category: 'items',
+    mcPath: 'assets/minecraft/textures/item/diamond_axe.png',
+    pixels: generateAxe('#2CB8C5', '#5DECF5'),
+  },
+  bow: {
+    name: 'Bow',
+    category: 'items',
+    mcPath: 'assets/minecraft/textures/item/bow.png',
+    pixels: generateBow(),
+  },
+  arrow: {
+    name: 'Arrow',
+    category: 'items',
+    mcPath: 'assets/minecraft/textures/item/arrow.png',
+    pixels: generateArrow(),
+  },
+  trident: {
+    name: 'Trident',
+    category: 'items',
+    mcPath: 'assets/minecraft/textures/item/trident.png',
+    pixels: generateTrident(),
+  },
   blank: {
     name: 'Blank',
     category: 'blocks',
@@ -93,9 +129,54 @@ export const TEXTURE_TARGETS = [
   { value: 'block/furnace_front', label: 'Furnace Front' },
   { value: 'block/ice', label: 'Ice' },
   { value: 'block/snow', label: 'Snow' },
+  // --- Swords ---
+  { value: 'item/wooden_sword', label: 'Wooden Sword' },
+  { value: 'item/stone_sword', label: 'Stone Sword' },
+  { value: 'item/iron_sword', label: 'Iron Sword' },
+  { value: 'item/golden_sword', label: 'Gold Sword' },
   { value: 'item/diamond_sword', label: 'Diamond Sword' },
+  { value: 'item/netherite_sword', label: 'Netherite Sword' },
+  // --- Pickaxes ---
+  { value: 'item/wooden_pickaxe', label: 'Wooden Pickaxe' },
+  { value: 'item/stone_pickaxe', label: 'Stone Pickaxe' },
+  { value: 'item/iron_pickaxe', label: 'Iron Pickaxe' },
+  { value: 'item/golden_pickaxe', label: 'Gold Pickaxe' },
   { value: 'item/diamond_pickaxe', label: 'Diamond Pickaxe' },
+  { value: 'item/netherite_pickaxe', label: 'Netherite Pickaxe' },
+  // --- Axes ---
+  { value: 'item/wooden_axe', label: 'Wooden Axe' },
+  { value: 'item/stone_axe', label: 'Stone Axe' },
+  { value: 'item/iron_axe', label: 'Iron Axe' },
+  { value: 'item/golden_axe', label: 'Gold Axe' },
+  { value: 'item/diamond_axe', label: 'Diamond Axe' },
+  { value: 'item/netherite_axe', label: 'Netherite Axe' },
+  // --- Shovels ---
+  { value: 'item/wooden_shovel', label: 'Wooden Shovel' },
+  { value: 'item/stone_shovel', label: 'Stone Shovel' },
+  { value: 'item/iron_shovel', label: 'Iron Shovel' },
+  { value: 'item/diamond_shovel', label: 'Diamond Shovel' },
+  { value: 'item/netherite_shovel', label: 'Netherite Shovel' },
+  // --- Ranged ---
+  { value: 'item/bow', label: 'Bow' },
+  { value: 'item/crossbow_standby', label: 'Crossbow' },
+  { value: 'item/arrow', label: 'Arrow' },
+  { value: 'item/trident', label: 'Trident' },
+  // --- Armor ---
+  { value: 'item/diamond_helmet', label: 'Diamond Helmet' },
+  { value: 'item/diamond_chestplate', label: 'Diamond Chestplate' },
+  { value: 'item/diamond_leggings', label: 'Diamond Leggings' },
+  { value: 'item/diamond_boots', label: 'Diamond Boots' },
+  { value: 'item/netherite_helmet', label: 'Netherite Helmet' },
+  { value: 'item/netherite_chestplate', label: 'Netherite Chestplate' },
+  { value: 'item/netherite_leggings', label: 'Netherite Leggings' },
+  { value: 'item/netherite_boots', label: 'Netherite Boots' },
+  { value: 'item/shield_base', label: 'Shield' },
+  // --- Food & Items ---
   { value: 'item/apple', label: 'Apple' },
+  { value: 'item/golden_apple', label: 'Golden Apple' },
+  { value: 'item/ender_pearl', label: 'Ender Pearl' },
+  { value: 'item/diamond', label: 'Diamond (Item)' },
+  { value: 'item/emerald', label: 'Emerald (Item)' },
 ];
 
 function fill16(color) {
@@ -303,6 +384,129 @@ function generateDiamondOre() {
   [[4,3],[10,9],[7,12]].forEach(([y,x]) => {
     grid[y][x] = diamondDark;
   });
+  return grid;
+}
+
+function generateSword(dark, light) {
+  const grid = fill16(null);
+  const handle = '#8B6914';
+  const guard = '#666666';
+  const pommel = '#444444';
+  // Blade (diagonal from top-right to center)
+  [[1,14],[2,13],[3,12],[4,11],[5,10],[6,9],[7,8]].forEach(([y,x]) => {
+    grid[y][x] = light;
+    if (x > 0) grid[y][x-1] = dark;
+  });
+  // Blade edge highlight
+  [[1,15],[2,14],[3,13],[4,12],[5,11],[6,10]].forEach(([y,x]) => {
+    if (x < 16) grid[y][x] = light;
+  });
+  // Guard
+  grid[8][7] = guard; grid[8][9] = guard;
+  grid[7][7] = guard; grid[9][9] = guard;
+  // Handle
+  [[9,7],[10,6],[11,5]].forEach(([y,x]) => {
+    grid[y][x] = handle;
+  });
+  // Pommel
+  grid[12][4] = pommel;
+  return grid;
+}
+
+function generatePickaxe(dark, light) {
+  const grid = fill16(null);
+  const handle = '#8B6914';
+  // Handle (diagonal)
+  [[8,8],[9,7],[10,6],[11,5],[12,4],[13,3],[14,2]].forEach(([y,x]) => {
+    grid[y][x] = handle;
+  });
+  // Head
+  [[3,9],[3,10],[3,11],[3,12],[3,13]].forEach(([y,x]) => {
+    grid[y][x] = light;
+  });
+  [[4,9],[4,13]].forEach(([y,x]) => { grid[y][x] = dark; });
+  [[5,8],[5,14]].forEach(([y,x]) => { grid[y][x] = dark; });
+  [[6,7],[6,9],[6,10],[6,11],[6,12],[6,13]].forEach(([y,x]) => { grid[y][x] = dark; });
+  [[4,10],[4,11],[4,12]].forEach(([y,x]) => { grid[y][x] = light; });
+  [[5,9],[5,10],[5,11],[5,12],[5,13]].forEach(([y,x]) => { grid[y][x] = light; });
+  grid[7][8] = dark; grid[7][9] = dark;
+  return grid;
+}
+
+function generateAxe(dark, light) {
+  const grid = fill16(null);
+  const handle = '#8B6914';
+  // Handle (diagonal)
+  [[8,8],[9,7],[10,6],[11,5],[12,4],[13,3],[14,2]].forEach(([y,x]) => {
+    grid[y][x] = handle;
+  });
+  // Axe head
+  [[3,10],[3,11],[3,12]].forEach(([y,x]) => { grid[y][x] = light; });
+  [[4,9],[4,10],[4,11],[4,12],[4,13]].forEach(([y,x]) => { grid[y][x] = light; });
+  [[5,9],[5,10],[5,11],[5,12],[5,13]].forEach(([y,x]) => { grid[y][x] = dark; });
+  [[6,10],[6,11],[6,12]].forEach(([y,x]) => { grid[y][x] = dark; });
+  grid[7][9] = dark; grid[7][10] = dark;
+  grid[2,11] = light;
+  return grid;
+}
+
+function generateBow() {
+  const grid = fill16(null);
+  const wood = '#8B6914';
+  const string = '#CCCCCC';
+  // Bow curve
+  [[1,10],[2,11],[3,12],[4,12],[5,12],[6,11],[7,10],[8,9],[9,8],[10,7],[11,6],[12,5],[13,5],[14,5],[15,6]].forEach(([y,x]) => {
+    grid[y][x] = wood;
+  });
+  // String
+  [[1,10],[2,9],[3,8],[4,7],[5,7],[6,7],[7,7],[8,7],[9,7],[10,7],[11,7],[12,6],[13,5]].forEach(([y,x]) => {
+    if (!grid[y][x]) grid[y][x] = string;
+  });
+  return grid;
+}
+
+function generateArrow() {
+  const grid = fill16(null);
+  const shaft = '#8B6914';
+  const tip = '#888888';
+  const tipDark = '#555555';
+  const feather = '#EEEEEE';
+  // Shaft (diagonal)
+  [[4,11],[5,10],[6,9],[7,8],[8,7],[9,6],[10,5],[11,4]].forEach(([y,x]) => {
+    grid[y][x] = shaft;
+  });
+  // Arrow tip
+  grid[2][13] = tipDark;
+  grid[3][12] = tip;
+  grid[3][13] = tipDark;
+  grid[4][12] = tip;
+  // Feathers
+  grid[12][3] = feather;
+  grid[12][4] = feather;
+  grid[13][2] = feather;
+  grid[13][3] = feather;
+  grid[11][3] = feather;
+  return grid;
+}
+
+function generateTrident() {
+  const grid = fill16(null);
+  const dark = '#1A5276';
+  const light = '#2E86C1';
+  // Handle
+  [[8,8],[9,7],[10,6],[11,5],[12,4],[13,3],[14,2]].forEach(([y,x]) => {
+    grid[y][x] = dark;
+  });
+  // Center prong
+  [[2,11],[3,10],[4,9],[5,9],[6,9],[7,9]].forEach(([y,x]) => {
+    grid[y][x] = light;
+  });
+  // Left prong
+  [[2,9],[3,8],[4,8]].forEach(([y,x]) => { grid[y][x] = light; });
+  // Right prong
+  [[2,13],[3,12],[4,10]].forEach(([y,x]) => { grid[y][x] = light; });
+  // Tips
+  grid[1][11] = dark; grid[1][9] = dark; grid[1][13] = dark;
   return grid;
 }
 
