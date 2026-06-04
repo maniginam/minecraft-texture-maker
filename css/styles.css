@@ -28,10 +28,11 @@ header h1 {
 
 main {
   display: grid;
-  grid-template-columns: 220px 1fr 240px;
+  grid-template-columns: 220px 1fr 240px 400px;
   gap: 16px;
   padding: 16px;
-  max-width: 1200px;
+  padding-right: 0;
+  max-width: 1580px;
   margin: 0 auto;
 }
 
@@ -43,8 +44,8 @@ h2 {
   letter-spacing: 1px;
 }
 
-/* Sidebar Left */
-.sidebar-left, .sidebar-right {
+/* Sidebars */
+.sidebar-left, .sidebar-right, .sidebar-help {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -410,30 +411,12 @@ h2 {
 }
 
 /* Help Section */
-.help-toggle-btn {
-  width: 100%;
-  padding: 10px;
-  border: 2px dashed #81c784;
-  border-radius: 8px;
-  background: #2e7d32;
-  color: white;
-  font-size: 15px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.help-toggle-btn:hover {
-  background: #388e3c;
-  border-style: solid;
+.sidebar-help {
+  margin-left: 50px;
 }
 
 .help-steps {
-  margin-top: 12px;
-}
-
-.help-steps.hidden {
-  display: none;
+  margin-top: 4px;
 }
 
 .help-step {
@@ -521,18 +504,18 @@ h2 {
 }
 
 /* Responsive */
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
   main {
     grid-template-columns: 1fr;
     max-width: 560px;
   }
 
-  .sidebar-left, .sidebar-right {
+  .sidebar-left, .sidebar-right, .sidebar-help {
     flex-direction: row;
     flex-wrap: wrap;
   }
 
-  .sidebar-left > *, .sidebar-right > * {
+  .sidebar-left > *, .sidebar-right > *, .sidebar-help > * {
     flex: 1;
     min-width: 180px;
   }

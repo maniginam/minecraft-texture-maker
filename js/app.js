@@ -213,13 +213,5 @@ document.getElementById('btn-download').addEventListener('click', async () => {
   }
 });
 
-// --- Help Toggle ---
-document.getElementById('btn-toggle-help').addEventListener('click', () => {
-  const steps = document.getElementById('help-steps');
-  const btn = document.getElementById('btn-toggle-help');
-  steps.classList.toggle('hidden');
-  btn.textContent = steps.classList.contains('hidden') ? 'Show Me How!' : 'Hide Steps';
-});
-
 // Initial preview
 updatePreview();
