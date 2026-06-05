@@ -389,124 +389,229 @@ function generateDiamondOre() {
 
 function generateSword(dark, light) {
   const grid = fill16(null);
-  const handle = '#8B6914';
-  const guard = '#666666';
-  const pommel = '#444444';
-  // Blade (diagonal from top-right to center)
-  [[1,14],[2,13],[3,12],[4,11],[5,10],[6,9],[7,8]].forEach(([y,x]) => {
-    grid[y][x] = light;
-    if (x > 0) grid[y][x-1] = dark;
-  });
-  // Blade edge highlight
-  [[1,15],[2,14],[3,13],[4,12],[5,11],[6,10]].forEach(([y,x]) => {
-    if (x < 16) grid[y][x] = light;
-  });
-  // Guard
-  grid[8][7] = guard; grid[8][9] = guard;
-  grid[7][7] = guard; grid[9][9] = guard;
+  const handle = '#6B4423';
+  const handleLight = '#8B6914';
+  const guard = '#555555';
+  const guardLight = '#888888';
+  // Blade — 2px wide diagonal for visibility
+  // Right edge (light)
+  grid[1][13] = light;
+  grid[2][12] = light;
+  grid[3][11] = light;
+  grid[4][10] = light;
+  grid[5][9] = light;
+  grid[6][8] = light;
+  grid[7][7] = light;
+  // Left edge (dark)
+  grid[2][13] = dark;
+  grid[3][12] = dark;
+  grid[4][11] = dark;
+  grid[5][10] = dark;
+  grid[6][9] = dark;
+  grid[7][8] = dark;
+  // Tip
+  grid[0][14] = light;
+  grid[1][14] = dark;
+  // Guard (crosspiece perpendicular to blade)
+  grid[8][5] = guardLight;
+  grid[8][6] = guard;
+  grid[8][7] = guard;
+  grid[8][8] = guardLight;
   // Handle
-  [[9,7],[10,6],[11,5]].forEach(([y,x]) => {
-    grid[y][x] = handle;
-  });
+  grid[9][6] = handleLight;
+  grid[10][5] = handleLight;
+  grid[11][4] = handle;
+  grid[12][3] = handle;
   // Pommel
-  grid[12][4] = pommel;
+  grid[13][2] = guardLight;
   return grid;
 }
 
 function generatePickaxe(dark, light) {
   const grid = fill16(null);
-  const handle = '#8B6914';
-  // Handle (diagonal)
-  [[8,8],[9,7],[10,6],[11,5],[12,4],[13,3],[14,2]].forEach(([y,x]) => {
-    grid[y][x] = handle;
-  });
-  // Head
-  [[3,9],[3,10],[3,11],[3,12],[3,13]].forEach(([y,x]) => {
-    grid[y][x] = light;
-  });
-  [[4,9],[4,13]].forEach(([y,x]) => { grid[y][x] = dark; });
-  [[5,8],[5,14]].forEach(([y,x]) => { grid[y][x] = dark; });
-  [[6,7],[6,9],[6,10],[6,11],[6,12],[6,13]].forEach(([y,x]) => { grid[y][x] = dark; });
-  [[4,10],[4,11],[4,12]].forEach(([y,x]) => { grid[y][x] = light; });
-  [[5,9],[5,10],[5,11],[5,12],[5,13]].forEach(([y,x]) => { grid[y][x] = light; });
-  grid[7][8] = dark; grid[7][9] = dark;
+  const handle = '#6B4423';
+  const handleLight = '#8B6914';
+  // Stick (diagonal)
+  grid[14][1] = handle;
+  grid[13][2] = handle;
+  grid[12][3] = handleLight;
+  grid[11][4] = handleLight;
+  grid[10][5] = handleLight;
+  grid[9][6] = handleLight;
+  grid[8][7] = handleLight;
+  grid[7][8] = handleLight;
+  grid[6][9] = handleLight;
+  // Pickaxe head — two pointed ends going top-left and bottom-right
+  // The head sits perpendicular to the stick at the top
+  // Top-left point
+  grid[3][6] = light;
+  grid[4][7] = dark;
+  grid[2][5] = light;
+  grid[1][4] = light;
+  // Center block where stick meets head
+  grid[5][8] = dark;
+  grid[5][9] = dark;
+  grid[5][10] = dark;
+  grid[4][8] = light;
+  grid[4][9] = light;
+  grid[4][10] = light;
+  grid[3][7] = light;
+  grid[3][8] = light;
+  grid[3][9] = dark;
+  // Bottom-right point
+  grid[4][11] = light;
+  grid[5][11] = dark;
+  grid[6][12] = light;
+  grid[7][13] = light;
   return grid;
 }
 
 function generateAxe(dark, light) {
   const grid = fill16(null);
-  const handle = '#8B6914';
-  // Handle (diagonal)
-  [[8,8],[9,7],[10,6],[11,5],[12,4],[13,3],[14,2]].forEach(([y,x]) => {
-    grid[y][x] = handle;
-  });
-  // Axe head
-  [[3,10],[3,11],[3,12]].forEach(([y,x]) => { grid[y][x] = light; });
-  [[4,9],[4,10],[4,11],[4,12],[4,13]].forEach(([y,x]) => { grid[y][x] = light; });
-  [[5,9],[5,10],[5,11],[5,12],[5,13]].forEach(([y,x]) => { grid[y][x] = dark; });
-  [[6,10],[6,11],[6,12]].forEach(([y,x]) => { grid[y][x] = dark; });
-  grid[7][9] = dark; grid[7][10] = dark;
-  grid[2,11] = light;
+  const handle = '#6B4423';
+  const handleLight = '#8B6914';
+  // Stick (diagonal)
+  grid[14][1] = handle;
+  grid[13][2] = handle;
+  grid[12][3] = handleLight;
+  grid[11][4] = handleLight;
+  grid[10][5] = handleLight;
+  grid[9][6] = handleLight;
+  grid[8][7] = handleLight;
+  grid[7][8] = handleLight;
+  grid[6][9] = handleLight;
+  // Axe head — chunky blade on one side of stick top
+  // Blade edge (curved)
+  grid[2][10] = light;
+  grid[2][11] = light;
+  grid[3][12] = light;
+  grid[4][12] = light;
+  grid[4][13] = light;
+  grid[5][13] = light;
+  grid[6][13] = dark;
+  grid[6][12] = dark;
+  grid[7][11] = dark;
+  // Blade fill
+  grid[3][10] = light;
+  grid[3][11] = dark;
+  grid[4][10] = light;
+  grid[4][11] = dark;
+  grid[5][10] = dark;
+  grid[5][11] = dark;
+  grid[5][12] = dark;
+  grid[6][10] = dark;
+  grid[6][11] = dark;
+  // Connect to stick
+  grid[5][9] = dark;
+  grid[4][9] = light;
+  grid[3][9] = light;
   return grid;
 }
 
 function generateBow() {
   const grid = fill16(null);
-  const wood = '#8B6914';
-  const string = '#CCCCCC';
-  // Bow curve
-  [[1,10],[2,11],[3,12],[4,12],[5,12],[6,11],[7,10],[8,9],[9,8],[10,7],[11,6],[12,5],[13,5],[14,5],[15,6]].forEach(([y,x]) => {
-    grid[y][x] = wood;
-  });
-  // String
-  [[1,10],[2,9],[3,8],[4,7],[5,7],[6,7],[7,7],[8,7],[9,7],[10,7],[11,7],[12,6],[13,5]].forEach(([y,x]) => {
-    if (!grid[y][x]) grid[y][x] = string;
-  });
+  const wood = '#6B4423';
+  const woodLight = '#8B6914';
+  const string = '#AAAAAA';
+  // Bow limb — curved arc, right side
+  grid[1][9] = wood;
+  grid[2][10] = wood;
+  grid[3][11] = woodLight;
+  grid[4][11] = woodLight;
+  grid[5][12] = woodLight;
+  grid[6][12] = woodLight;
+  grid[7][12] = woodLight;
+  grid[8][12] = woodLight;
+  grid[9][11] = woodLight;
+  grid[10][11] = woodLight;
+  grid[11][10] = wood;
+  grid[12][9] = wood;
+  // Bowstring — straight line connecting tips
+  grid[1][9] = wood;
+  grid[2][8] = string;
+  grid[3][8] = string;
+  grid[4][7] = string;
+  grid[5][7] = string;
+  grid[6][7] = string;
+  grid[7][7] = string;
+  grid[8][7] = string;
+  grid[9][7] = string;
+  grid[10][8] = string;
+  grid[11][8] = string;
+  grid[12][9] = wood;
   return grid;
 }
 
 function generateArrow() {
   const grid = fill16(null);
   const shaft = '#8B6914';
-  const tip = '#888888';
-  const tipDark = '#555555';
+  const shaftDark = '#6B4423';
+  const tip = '#777777';
+  const tipLight = '#AAAAAA';
   const feather = '#EEEEEE';
-  // Shaft (diagonal)
-  [[4,11],[5,10],[6,9],[7,8],[8,7],[9,6],[10,5],[11,4]].forEach(([y,x]) => {
-    grid[y][x] = shaft;
-  });
-  // Arrow tip
-  grid[2][13] = tipDark;
-  grid[3][12] = tip;
-  grid[3][13] = tipDark;
-  grid[4][12] = tip;
-  // Feathers
+  const featherGray = '#CCCCCC';
+  // Shaft — straight diagonal
+  grid[3][12] = shaft;
+  grid[4][11] = shaft;
+  grid[5][10] = shaft;
+  grid[6][9] = shaft;
+  grid[7][8] = shaft;
+  grid[8][7] = shaft;
+  grid[9][6] = shaft;
+  grid[10][5] = shaftDark;
+  grid[11][4] = shaftDark;
+  // Arrowhead — triangle at top-right
+  grid[1][14] = tipLight;
+  grid[2][13] = tip;
+  grid[2][14] = tipLight;
+  grid[3][13] = tip;
+  // Fletching — feathers at bottom-left
   grid[12][3] = feather;
-  grid[12][4] = feather;
+  grid[11][3] = featherGray;
+  grid[12][4] = featherGray;
   grid[13][2] = feather;
-  grid[13][3] = feather;
-  grid[11][3] = feather;
+  grid[13][3] = featherGray;
   return grid;
 }
 
 function generateTrident() {
   const grid = fill16(null);
-  const dark = '#1A5276';
-  const light = '#2E86C1';
-  // Handle
-  [[8,8],[9,7],[10,6],[11,5],[12,4],[13,3],[14,2]].forEach(([y,x]) => {
-    grid[y][x] = dark;
-  });
+  const shaft = '#1A5276';
+  const shaftLight = '#2471A3';
+  const prong = '#2E86C1';
+  const prongTip = '#5DADE2';
+  // Shaft — straight vertical center
+  grid[14][7] = shaft;
+  grid[13][7] = shaft;
+  grid[12][7] = shaft;
+  grid[11][7] = shaftLight;
+  grid[10][7] = shaftLight;
+  grid[9][7] = shaftLight;
+  grid[8][7] = shaftLight;
+  grid[7][7] = shaftLight;
+  grid[6][7] = prong;
+  grid[5][7] = prong;
   // Center prong
-  [[2,11],[3,10],[4,9],[5,9],[6,9],[7,9]].forEach(([y,x]) => {
-    grid[y][x] = light;
-  });
+  grid[4][7] = prong;
+  grid[3][7] = prong;
+  grid[2][7] = prongTip;
   // Left prong
-  [[2,9],[3,8],[4,8]].forEach(([y,x]) => { grid[y][x] = light; });
+  grid[5][5] = prong;
+  grid[4][5] = prong;
+  grid[3][5] = prong;
+  grid[2][5] = prongTip;
+  grid[5][6] = prong;
   // Right prong
-  [[2,13],[3,12],[4,10]].forEach(([y,x]) => { grid[y][x] = light; });
-  // Tips
-  grid[1][11] = dark; grid[1][9] = dark; grid[1][13] = dark;
+  grid[5][9] = prong;
+  grid[4][9] = prong;
+  grid[3][9] = prong;
+  grid[2][9] = prongTip;
+  grid[5][8] = prong;
+  // Crossbar connecting prongs
+  grid[6][5] = shaft;
+  grid[6][6] = shaft;
+  grid[6][8] = shaft;
+  grid[6][9] = shaft;
   return grid;
 }
 
