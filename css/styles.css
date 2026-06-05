@@ -504,6 +504,61 @@ h2 {
 }
 
 /* Responsive */
+/* Featured Packs */
+.featured-packs {
+  max-width: 1580px;
+  margin: 24px auto 0;
+  padding: 0 16px 24px;
+}
+
+.featured-packs h2 {
+  font-size: 18px;
+  color: #ff9800;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.pack-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #383838;
+  border-radius: 10px;
+  padding: 16px 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  margin-bottom: 8px;
+}
+
+.pack-card-info h3 {
+  font-size: 16px;
+  color: #e0e0e0;
+  margin-bottom: 4px;
+}
+
+.pack-card-info p {
+  font-size: 13px;
+  color: #aaa;
+  line-height: 1.4;
+}
+
+.pack-download-btn {
+  flex-shrink: 0;
+  padding: 10px 24px;
+  border-radius: 8px;
+  background: #ff9800;
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.15s;
+  margin-left: 20px;
+}
+
+.pack-download-btn:hover {
+  background: #f57c00;
+}
+
 @media (max-width: 1100px) {
   main {
     grid-template-columns: 1fr;
