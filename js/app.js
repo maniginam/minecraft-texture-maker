@@ -213,6 +213,47 @@ document.getElementById('btn-download').addEventListener('click', async () => {
   }
 });
 
+// --- Background Removal ---
+function removeBackground(imageData, width, height) {
+  const data = imageData.data;
+  // Sample corners to detect background color
+  const corners = [
+    0,                              // top-left
+    (width - 1) * 4,               // top-right
+    (height - 1) * width * 4,      // bottom-left
+    ((height - 1) * width + (width - 1)) * 4, // bottom-right
+  ];
+  // Also sample edges (mid-top, mid-bottom, mid-left, mid-right)
+  const edges = [
+    (Math.floor(width / 2)) * 4,                          // mid-top
+    ((height - 1) * width + Math.floor(width / 2)) * 4,   // mid-bottom
+    (Math.floor(height / 2) * width) * 4,                  // mid-left
+    (Math.floor(height / 2) * width + (width - 1)) * 4,   // mid-right
+  ];
+  const samples = [...corners, ...edges];
+  // Find most common corner/edge color
+  const colorCounts = {};
+  samples.forEach(i => {
+    const key = `${data[i]},${data[i+1]},${data[i+2]}`;
+    colorCounts[key] = (colorCounts[key] || 0) + 1;
+  });
+  const bgColor = Object.entries(colorCounts)
+    .sort((a, b) => b[1] - a[1])[0][0]
+    .split(',').map(Number);
+
+  // Remove pixels that are close to the background color
+  const tolerance = 35;
+  for (let i = 0; i < data.length; i += 4) {
+    const dr = Math.abs(data[i] - bgColor[0]);
+    const dg = Math.abs(data[i+1] - bgColor[1]);
+    const db = Math.abs(data[i+2] - bgColor[2]);
+    if (dr + dg + db < tolerance) {
+      data[i+3] = 0; // make transparent
+    }
+  }
+  return imageData;
+}
+
 // --- Drag & Drop Image onto Canvas ---
 function loadImageToEditor(img) {
   const size = editor.gridSize;
@@ -222,7 +263,8 @@ function loadImageToEditor(img) {
   const tempCtx = tempCanvas.getContext('2d');
   tempCtx.imageSmoothingEnabled = false;
   tempCtx.drawImage(img, 0, 0, size, size);
-  const smallData = tempCtx.getImageData(0, 0, size, size);
+  let smallData = tempCtx.getImageData(0, 0, size, size);
+  smallData = removeBackground(smallData, size, size);
   const pixels = imageDataToPixels(smallData, size);
   editor.loadImageData(templateToScaledImageData({ pixels }, editor.displaySize));
 }
