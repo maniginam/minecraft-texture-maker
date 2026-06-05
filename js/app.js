@@ -254,19 +254,226 @@ function removeBackground(imageData, width, height) {
   return imageData;
 }
 
-// --- Drag & Drop Image onto Canvas ---
-function loadImageToEditor(img) {
+// --- Object Detection (find separate items in image) ---
+function findObjects(imageData, width, height) {
+  const data = imageData.data;
+  const labels = new Int32Array(width * height);
+  let nextLabel = 1;
+
+  function isVisible(x, y) {
+    if (x < 0 || x >= width || y < 0 || y >= height) return false;
+    return data[(y * width + x) * 4 + 3] > 30;
+  }
+
+  // Connected component labeling (flood fill)
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const idx = y * width + x;
+      if (labels[idx] !== 0 || !isVisible(x, y)) continue;
+      const label = nextLabel++;
+      const stack = [{ x, y }];
+      while (stack.length > 0) {
+        const p = stack.pop();
+        const pi = p.y * width + p.x;
+        if (p.x < 0 || p.x >= width || p.y < 0 || p.y >= height) continue;
+        if (labels[pi] !== 0 || !isVisible(p.x, p.y)) continue;
+        labels[pi] = label;
+        stack.push({ x: p.x + 1, y: p.y });
+        stack.push({ x: p.x - 1, y: p.y });
+        stack.push({ x: p.x, y: p.y + 1 });
+        stack.push({ x: p.x, y: p.y - 1 });
+      }
+    }
+  }
+
+  // Find bounding boxes for each label
+  const boxes = {};
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const label = labels[y * width + x];
+      if (label === 0) continue;
+      if (!boxes[label]) {
+        boxes[label] = { minX: x, minY: y, maxX: x, maxY: y, pixelCount: 0 };
+      }
+      const b = boxes[label];
+      b.minX = Math.min(b.minX, x);
+      b.minY = Math.min(b.minY, y);
+      b.maxX = Math.max(b.maxX, x);
+      b.maxY = Math.max(b.maxY, y);
+      b.pixelCount++;
+    }
+  }
+
+  // Filter out tiny noise (less than 2% of image area)
+  const minPixels = width * height * 0.02;
+  return Object.values(boxes).filter(b => b.pixelCount >= minPixels);
+}
+
+function extractObject(img, box, bgRemovedData, srcWidth, srcHeight) {
+  const objW = box.maxX - box.minX + 1;
+  const objH = box.maxY - box.minY + 1;
+  const maxDim = Math.max(objW, objH);
+  // Pad to square with some margin
+  const pad = Math.max(2, Math.floor(maxDim * 0.1));
+  const squareSize = maxDim + pad * 2;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = squareSize;
+  canvas.height = squareSize;
+  const ctx = canvas.getContext('2d');
+
+  // Center the object in the square
+  const offsetX = pad + Math.floor((maxDim - objW) / 2);
+  const offsetY = pad + Math.floor((maxDim - objH) / 2);
+
+  // Copy only the object pixels from the bg-removed data
+  const srcData = bgRemovedData.data;
+  const destData = ctx.createImageData(squareSize, squareSize);
+  for (let y = box.minY; y <= box.maxY; y++) {
+    for (let x = box.minX; x <= box.maxX; x++) {
+      const si = (y * srcWidth + x) * 4;
+      if (srcData[si + 3] <= 30) continue;
+      const dx = x - box.minX + offsetX;
+      const dy = y - box.minY + offsetY;
+      const di = (dy * squareSize + dx) * 4;
+      destData.data[di] = srcData[si];
+      destData.data[di + 1] = srcData[si + 1];
+      destData.data[di + 2] = srcData[si + 2];
+      destData.data[di + 3] = srcData[si + 3];
+    }
+  }
+  ctx.putImageData(destData, 0, 0);
+  return canvas;
+}
+
+function showObjectPicker(objectCanvases) {
+  // Remove existing picker if any
+  const existing = document.getElementById('object-picker-overlay');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'object-picker-overlay';
+  overlay.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; z-index: 1000;
+  `;
+
+  const title = document.createElement('div');
+  title.textContent = 'Pick the one you want!';
+  title.style.cssText = `
+    color: white; font-size: 24px; font-weight: bold; margin-bottom: 20px;
+    text-shadow: 2px 2px 0 #1b5e20;
+  `;
+  overlay.appendChild(title);
+
+  const grid = document.createElement('div');
+  grid.style.cssText = `
+    display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+    max-width: 800px;
+  `;
+
+  objectCanvases.forEach((objCanvas) => {
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = `
+      cursor: pointer; border: 3px solid #555; border-radius: 12px;
+      padding: 8px; background: #383838; transition: all 0.15s;
+      display: flex; align-items: center; justify-content: center;
+    `;
+    wrapper.addEventListener('mouseenter', () => {
+      wrapper.style.borderColor = '#4caf50';
+      wrapper.style.transform = 'scale(1.05)';
+    });
+    wrapper.addEventListener('mouseleave', () => {
+      wrapper.style.borderColor = '#555';
+      wrapper.style.transform = '';
+    });
+
+    const display = document.createElement('canvas');
+    display.width = 128;
+    display.height = 128;
+    const dCtx = display.getContext('2d');
+    dCtx.imageSmoothingEnabled = false;
+    // Checkerboard background for transparency
+    for (let cy = 0; cy < 128; cy += 8) {
+      for (let cx = 0; cx < 128; cx += 8) {
+        dCtx.fillStyle = ((cx + cy) / 8) % 2 === 0 ? '#666' : '#555';
+        dCtx.fillRect(cx, cy, 8, 8);
+      }
+    }
+    dCtx.drawImage(objCanvas, 0, 0, 128, 128);
+    display.style.cssText = 'image-rendering: pixelated; border-radius: 8px;';
+
+    wrapper.appendChild(display);
+    wrapper.addEventListener('click', () => {
+      loadSingleObjectToEditor(objCanvas);
+      overlay.remove();
+    });
+    grid.appendChild(wrapper);
+  });
+
+  overlay.appendChild(grid);
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.style.cssText = `
+    margin-top: 20px; padding: 10px 30px; border: none; border-radius: 8px;
+    background: #666; color: white; font-size: 16px; cursor: pointer;
+  `;
+  cancelBtn.addEventListener('click', () => overlay.remove());
+  overlay.appendChild(cancelBtn);
+
+  document.body.appendChild(overlay);
+}
+
+function loadSingleObjectToEditor(objCanvas) {
   const size = editor.gridSize;
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = size;
   tempCanvas.height = size;
   const tempCtx = tempCanvas.getContext('2d');
   tempCtx.imageSmoothingEnabled = false;
-  tempCtx.drawImage(img, 0, 0, size, size);
-  let smallData = tempCtx.getImageData(0, 0, size, size);
-  smallData = removeBackground(smallData, size, size);
+  tempCtx.drawImage(objCanvas, 0, 0, size, size);
+  const smallData = tempCtx.getImageData(0, 0, size, size);
   const pixels = imageDataToPixels(smallData, size);
   editor.loadImageData(templateToScaledImageData({ pixels }, editor.displaySize));
+}
+
+// --- Drag & Drop Image onto Canvas ---
+function loadImageToEditor(img) {
+  // Work at higher resolution for object detection
+  const detectSize = 256;
+  const detectCanvas = document.createElement('canvas');
+  detectCanvas.width = detectSize;
+  detectCanvas.height = detectSize;
+  const detectCtx = detectCanvas.getContext('2d');
+  detectCtx.imageSmoothingEnabled = false;
+  detectCtx.drawImage(img, 0, 0, detectSize, detectSize);
+  let detectData = detectCtx.getImageData(0, 0, detectSize, detectSize);
+  detectData = removeBackground(detectData, detectSize, detectSize);
+
+  const objects = findObjects(detectData, detectSize, detectSize);
+
+  if (objects.length <= 1) {
+    // Single object or no objects — load directly
+    const size = editor.gridSize;
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = size;
+    tempCanvas.height = size;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.imageSmoothingEnabled = false;
+    tempCtx.drawImage(img, 0, 0, size, size);
+    let smallData = tempCtx.getImageData(0, 0, size, size);
+    smallData = removeBackground(smallData, size, size);
+    const pixels = imageDataToPixels(smallData, size);
+    editor.loadImageData(templateToScaledImageData({ pixels }, editor.displaySize));
+  } else {
+    // Multiple objects — let kid pick
+    const objectCanvases = objects.map(box =>
+      extractObject(img, box, detectData, detectSize, detectSize)
+    );
+    showObjectPicker(objectCanvases);
+  }
 }
 
 const canvasWrapper = document.querySelector('.canvas-wrapper');
