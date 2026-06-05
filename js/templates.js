@@ -58,6 +58,24 @@ export const TEMPLATES = {
     mcPath: 'assets/minecraft/textures/block/diamond_ore.png',
     pixels: generateDiamondOre(),
   },
+  pvp_sword_blue: {
+    name: 'PvP Blue',
+    category: 'items',
+    mcPath: 'assets/minecraft/textures/item/diamond_sword.png',
+    pixels: generatePvpSword('blue'),
+  },
+  pvp_sword_red: {
+    name: 'PvP Red',
+    category: 'items',
+    mcPath: 'assets/minecraft/textures/item/diamond_sword.png',
+    pixels: generatePvpSword('red'),
+  },
+  pvp_sword_purple: {
+    name: 'PvP Purple',
+    category: 'items',
+    mcPath: 'assets/minecraft/textures/item/netherite_sword.png',
+    pixels: generatePvpSword('purple'),
+  },
   diamond_sword: {
     name: 'Sword',
     category: 'items',
@@ -384,6 +402,63 @@ function generateDiamondOre() {
   [[4,3],[10,9],[7,12]].forEach(([y,x]) => {
     grid[y][x] = diamondDark;
   });
+  return grid;
+}
+
+function generatePvpSword(style) {
+  const grid = fill16(null);
+  const palettes = {
+    blue: {
+      blade: ['#0033AA', '#1155CC', '#2277EE', '#44AAFF', '#77CCFF', '#AAEEFF'],
+      handle: ['#9988CC', '#BBAADD', '#DDCCEE', '#FFFFFF'],
+      pommel: ['#0033AA', '#1155CC'],
+    },
+    red: {
+      blade: ['#0044AA', '#1166DD', '#3399FF', '#55BBFF', '#88DDFF', '#BBFFFF'],
+      handle: ['#881111', '#CC2222', '#DD4444', '#FF6633'],
+      pommel: ['#0044AA', '#1166DD'],
+    },
+    purple: {
+      blade: ['#CCBBDD', '#DDCCEE', '#EEDDFF', '#FFFFFF', '#EEDDFF', '#DDCCEE'],
+      handle: ['#111111', '#222222', '#333333', '#CC44CC'],
+      pommel: ['#AA33AA', '#CC44CC'],
+    },
+  };
+  const p = palettes[style];
+  // Blade — 3px wide diagonal, checkerboard shading
+  // Rows 0-7: blade going from top-right to center
+  const bladePixels = [
+    // [row, cols[]]  — 3 pixels wide
+    [0, [13, 14]],
+    [1, [12, 13, 14]],
+    [2, [11, 12, 13]],
+    [3, [10, 11, 12]],
+    [4, [9, 10, 11]],
+    [5, [8, 9, 10]],
+    [6, [7, 8, 9]],
+    [7, [6, 7, 8]],
+  ];
+  bladePixels.forEach(([row, cols], ri) => {
+    cols.forEach((col, ci) => {
+      // Checkerboard: alternate colors based on (row+col) parity
+      const idx = (ri + ci) % 2 === 0 ? ri % p.blade.length : (ri + 1) % p.blade.length;
+      grid[row][col] = p.blade[idx];
+    });
+  });
+  // Guard — crosspiece perpendicular to blade, 3px tall
+  // Left side
+  grid[7][4] = p.handle[0]; grid[7][5] = p.handle[1];
+  grid[8][4] = p.handle[1]; grid[8][5] = p.handle[2];
+  grid[8][6] = p.handle[0]; grid[8][7] = p.handle[1];
+  grid[8][8] = p.handle[2]; grid[8][9] = p.handle[0];
+  grid[9][6] = p.handle[0]; grid[9][7] = p.handle[1];
+  // Handle — 2px wide diagonal
+  grid[9][5] = p.handle[2]; grid[10][4] = p.handle[3];
+  grid[10][5] = p.handle[1]; grid[11][3] = p.handle[2];
+  grid[11][4] = p.handle[0]; grid[12][3] = p.handle[1];
+  // Pommel
+  grid[13][1] = p.pommel[0]; grid[13][2] = p.pommel[1];
+  grid[12][2] = p.pommel[0]; grid[14][1] = p.pommel[1];
   return grid;
 }
 

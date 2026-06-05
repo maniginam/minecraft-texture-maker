@@ -213,5 +213,56 @@ document.getElementById('btn-download').addEventListener('click', async () => {
   }
 });
 
+// --- Drag & Drop Image onto Canvas ---
+function loadImageToEditor(img) {
+  const size = editor.gridSize;
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = size;
+  tempCanvas.height = size;
+  const tempCtx = tempCanvas.getContext('2d');
+  tempCtx.imageSmoothingEnabled = false;
+  tempCtx.drawImage(img, 0, 0, size, size);
+  const smallData = tempCtx.getImageData(0, 0, size, size);
+  const pixels = imageDataToPixels(smallData, size);
+  editor.loadImageData(templateToScaledImageData({ pixels }, editor.displaySize));
+}
+
+const canvasWrapper = document.querySelector('.canvas-wrapper');
+
+canvasWrapper.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  canvasWrapper.style.outline = '3px dashed #4caf50';
+});
+
+canvasWrapper.addEventListener('dragleave', () => {
+  canvasWrapper.style.outline = '';
+});
+
+canvasWrapper.addEventListener('drop', (e) => {
+  e.preventDefault();
+  canvasWrapper.style.outline = '';
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    const img = new Image();
+    img.onload = () => loadImageToEditor(img);
+    img.src = URL.createObjectURL(file);
+  }
+});
+
+// --- Paste Image (Ctrl+V / Cmd+V) ---
+document.addEventListener('paste', (e) => {
+  const items = e.clipboardData.items;
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      e.preventDefault();
+      const blob = item.getAsFile();
+      const img = new Image();
+      img.onload = () => loadImageToEditor(img);
+      img.src = URL.createObjectURL(blob);
+      break;
+    }
+  }
+});
+
 // Initial preview
 updatePreview();
