@@ -16,6 +16,7 @@ export class PixelEditor {
     this.undoStack = [];
     this.redoStack = [];
     this.maxUndo = 50;
+    this.mirrorMode = false;
 
     this._initCanvas();
     this._drawGrid();
@@ -107,8 +108,14 @@ export class PixelEditor {
   _applyTool(x, y) {
     if (this.currentTool === 'pencil') {
       this._setPixel(x, y, this.currentColor);
+      if (this.mirrorMode) {
+        this._setPixel(this.gridSize - 1 - x, y, this.currentColor);
+      }
     } else if (this.currentTool === 'eraser') {
       this._clearPixel(x, y);
+      if (this.mirrorMode) {
+        this._clearPixel(this.gridSize - 1 - x, y);
+      }
     }
   }
 
@@ -231,6 +238,10 @@ export class PixelEditor {
     this.currentColor = color;
   }
 
+  setMirrorMode(enabled) {
+    this.mirrorMode = enabled;
+  }
+
   setGridVisible(visible) {
     this.showGrid = visible;
     this._drawGrid();
@@ -293,35 +304,21 @@ export class PixelEditor {
     return this.ctx.getImageData(0, 0, this.displaySize, this.displaySize);
   }
 
-  flipHorizontal() {
+  _flip(scaleX, scaleY, drawX, drawY) {
     this._saveState();
     const imgData = this.ctx.getImageData(0, 0, this.displaySize, this.displaySize);
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = this.displaySize;
     tempCanvas.height = this.displaySize;
-    const tempCtx = tempCanvas.getContext('2d');
-    tempCtx.putImageData(imgData, 0, 0);
+    tempCanvas.getContext('2d').putImageData(imgData, 0, 0);
     this.ctx.clearRect(0, 0, this.displaySize, this.displaySize);
     this.ctx.save();
-    this.ctx.scale(-1, 1);
-    this.ctx.drawImage(tempCanvas, -this.displaySize, 0);
+    this.ctx.scale(scaleX, scaleY);
+    this.ctx.drawImage(tempCanvas, drawX, drawY);
     this.ctx.restore();
     this._updatePreview();
   }
 
-  flipVertical() {
-    this._saveState();
-    const imgData = this.ctx.getImageData(0, 0, this.displaySize, this.displaySize);
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = this.displaySize;
-    tempCanvas.height = this.displaySize;
-    const tempCtx = tempCanvas.getContext('2d');
-    tempCtx.putImageData(imgData, 0, 0);
-    this.ctx.clearRect(0, 0, this.displaySize, this.displaySize);
-    this.ctx.save();
-    this.ctx.scale(1, -1);
-    this.ctx.drawImage(tempCanvas, 0, -this.displaySize);
-    this.ctx.restore();
-    this._updatePreview();
-  }
+  flipHorizontal() { this._flip(-1, 1, -this.displaySize, 0); }
+  flipVertical() { this._flip(1, -1, 0, -this.displaySize); }
 }

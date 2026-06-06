@@ -112,6 +112,30 @@ export const TEMPLATES = {
     mcPath: 'assets/minecraft/textures/item/trident.png',
     pixels: generateTrident(),
   },
+  creeper: {
+    name: 'Creeper',
+    category: 'mobs',
+    mcPath: 'assets/minecraft/textures/entity/creeper/creeper.png',
+    pixels: generateCreeperFace(),
+  },
+  grass_top: {
+    name: 'Grass',
+    category: 'blocks',
+    mcPath: 'assets/minecraft/textures/block/grass_block_top.png',
+    pixels: generateGrassTop(),
+  },
+  gold_block: {
+    name: 'Gold',
+    category: 'blocks',
+    mcPath: 'assets/minecraft/textures/block/gold_block.png',
+    pixels: generateGoldBlock(),
+  },
+  pumpkin: {
+    name: 'Pumpkin',
+    category: 'blocks',
+    mcPath: 'assets/minecraft/textures/block/pumpkin_side.png',
+    pixels: generatePumpkin(),
+  },
   blank: {
     name: 'Blank',
     category: 'blocks',
@@ -687,6 +711,85 @@ function generateTrident() {
   grid[6][6] = shaft;
   grid[6][8] = shaft;
   grid[6][9] = shaft;
+  return grid;
+}
+
+function generateCreeperFace() {
+  const green = '#4CAF50';
+  const dark = '#2E7D32';
+  const light = '#81C784';
+  const black = '#1B5E20';
+  const grid = fill16(green);
+  // Noise
+  [[0,1],[0,8],[1,4],[1,13],[2,2],[2,10],[3,6],[3,14],[4,0],[4,11],
+   [5,3],[5,9],[6,7],[6,14],[7,1],[7,12],[8,5],[8,10],[9,0],[9,8],
+   [10,3],[10,13],[11,6],[11,11],[12,1],[12,9],[13,4],[13,14],[14,7],[14,12],[15,2],[15,10]]
+    .forEach(([y,x], i) => { grid[y][x] = i % 2 === 0 ? dark : light; });
+  // Eyes (4x4 each)
+  for (let y = 4; y <= 7; y++) {
+    for (let x = 3; x <= 6; x++) grid[y][x] = black;
+    for (let x = 9; x <= 12; x++) grid[y][x] = black;
+  }
+  // Mouth
+  for (let y = 8; y <= 9; y++) { grid[y][7] = black; grid[y][8] = black; }
+  for (let y = 10; y <= 11; y++) {
+    for (let x = 6; x <= 9; x++) grid[y][x] = black;
+  }
+  return grid;
+}
+
+function generateGrassTop() {
+  const green = '#5D9B3A';
+  const dark = '#4A7F2E';
+  const light = '#7BC74D';
+  const grid = fill16(green);
+  [[0,3],[0,10],[1,1],[1,7],[1,14],[2,4],[2,11],[3,0],[3,8],[3,15],
+   [4,5],[4,12],[5,2],[5,9],[6,6],[6,13],[7,0],[7,7],[7,14],
+   [8,3],[8,10],[9,1],[9,8],[9,15],[10,5],[10,12],[11,0],[11,7],[11,14],
+   [12,3],[12,10],[13,6],[13,13],[14,1],[14,8],[15,4],[15,11]]
+    .forEach(([y,x], i) => { grid[y][x] = i % 3 === 0 ? dark : light; });
+  return grid;
+}
+
+function generateGoldBlock() {
+  const gold = '#FFD700';
+  const dark = '#DAA520';
+  const light = '#FFE44D';
+  const border = '#B8860B';
+  const grid = fill16(gold);
+  // Border
+  for (let i = 0; i < 16; i++) {
+    grid[0][i] = border; grid[15][i] = border;
+    grid[i][0] = border; grid[i][15] = border;
+  }
+  // Inner highlights
+  for (let i = 1; i < 15; i++) { grid[1][i] = light; grid[i][1] = light; }
+  // Inner shadows
+  for (let i = 1; i < 15; i++) { grid[14][i] = dark; grid[i][14] = dark; }
+  // Noise
+  [[3,5],[3,10],[5,3],[5,8],[5,12],[7,6],[7,11],[9,4],[9,9],[11,7],[11,12],[13,3],[13,10]]
+    .forEach(([y,x], i) => { grid[y][x] = i % 2 === 0 ? dark : light; });
+  return grid;
+}
+
+function generatePumpkin() {
+  const orange = '#E67E22';
+  const dark = '#D35400';
+  const light = '#F39C12';
+  const stem = '#2E7D32';
+  const grid = fill16(orange);
+  // Vertical ribs
+  [3, 7, 11].forEach(x => {
+    for (let y = 1; y < 15; y++) grid[y][x] = dark;
+  });
+  // Highlights
+  [5, 9, 13].forEach(x => {
+    for (let y = 2; y < 14; y++) grid[y][x] = light;
+  });
+  // Top/bottom edges
+  for (let x = 0; x < 16; x++) { grid[0][x] = dark; grid[15][x] = dark; }
+  // Stem
+  grid[0][7] = stem; grid[0][8] = stem;
   return grid;
 }
 

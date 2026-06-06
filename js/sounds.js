@@ -12,98 +12,87 @@ function getCtx() {
   return audioCtx;
 }
 
-function canPlay() {
-  return getCtx() !== null;
+function createTone(type = 'sine') {
+  const ctx = getCtx();
+  if (!ctx) return null;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  return { osc, gain, ctx, t: ctx.currentTime };
 }
 
 export function playPlace() {
-  if (!canPlay()) return;
-  const ctx = getCtx();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-  osc.frequency.setValueAtTime(800, ctx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.05);
-  gain.gain.setValueAtTime(0.08, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
-  osc.start(ctx.currentTime);
-  osc.stop(ctx.currentTime + 0.08);
+  const tone = createTone();
+  if (!tone) return;
+  const { osc, gain, t } = tone;
+  osc.frequency.setValueAtTime(800, t);
+  osc.frequency.exponentialRampToValueAtTime(1200, t + 0.05);
+  gain.gain.setValueAtTime(0.08, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+  osc.start(t);
+  osc.stop(t + 0.08);
 }
 
 export function playSuccess() {
-  if (!canPlay()) return;
   const ctx = getCtx();
+  if (!ctx) return;
   [0, 0.1, 0.2].forEach((delay, i) => {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.frequency.setValueAtTime([523, 659, 784][i], ctx.currentTime + delay);
-    gain.gain.setValueAtTime(0.1, ctx.currentTime + delay);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.15);
-    osc.start(ctx.currentTime + delay);
-    osc.stop(ctx.currentTime + delay + 0.15);
+    const tone = createTone();
+    if (!tone) return;
+    const { osc, gain, t } = tone;
+    osc.frequency.setValueAtTime([523, 659, 784][i], t + delay);
+    gain.gain.setValueAtTime(0.1, t + delay);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.15);
+    osc.start(t + delay);
+    osc.stop(t + delay + 0.15);
   });
 }
 
 export function playUndo() {
-  if (!canPlay()) return;
-  const ctx = getCtx();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-  osc.frequency.setValueAtTime(600, ctx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.1);
-  gain.gain.setValueAtTime(0.08, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
-  osc.start(ctx.currentTime);
-  osc.stop(ctx.currentTime + 0.12);
+  const tone = createTone();
+  if (!tone) return;
+  const { osc, gain, t } = tone;
+  osc.frequency.setValueAtTime(600, t);
+  osc.frequency.exponentialRampToValueAtTime(400, t + 0.1);
+  gain.gain.setValueAtTime(0.08, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+  osc.start(t);
+  osc.stop(t + 0.12);
 }
 
 export function playClear() {
-  if (!canPlay()) return;
-  const ctx = getCtx();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-  osc.type = 'sawtooth';
-  osc.frequency.setValueAtTime(500, ctx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.2);
-  gain.gain.setValueAtTime(0.06, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
-  osc.start(ctx.currentTime);
-  osc.stop(ctx.currentTime + 0.25);
+  const tone = createTone('sawtooth');
+  if (!tone) return;
+  const { osc, gain, t } = tone;
+  osc.frequency.setValueAtTime(500, t);
+  osc.frequency.exponentialRampToValueAtTime(100, t + 0.2);
+  gain.gain.setValueAtTime(0.06, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+  osc.start(t);
+  osc.stop(t + 0.25);
 }
 
 export function playClick() {
-  if (!canPlay()) return;
-  const ctx = getCtx();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-  osc.frequency.setValueAtTime(1000, ctx.currentTime);
-  gain.gain.setValueAtTime(0.05, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
-  osc.start(ctx.currentTime);
-  osc.stop(ctx.currentTime + 0.03);
+  const tone = createTone();
+  if (!tone) return;
+  const { osc, gain, t } = tone;
+  osc.frequency.setValueAtTime(1000, t);
+  gain.gain.setValueAtTime(0.05, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
+  osc.start(t);
+  osc.stop(t + 0.03);
 }
 
 export function playError() {
-  if (!canPlay()) return;
-  const ctx = getCtx();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-  osc.type = 'square';
-  osc.frequency.setValueAtTime(200, ctx.currentTime);
-  osc.frequency.setValueAtTime(150, ctx.currentTime + 0.1);
-  gain.gain.setValueAtTime(0.08, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
-  osc.start(ctx.currentTime);
-  osc.stop(ctx.currentTime + 0.2);
+  const tone = createTone('square');
+  if (!tone) return;
+  const { osc, gain, t } = tone;
+  osc.frequency.setValueAtTime(200, t);
+  osc.frequency.exponentialRampToValueAtTime(150, t + 0.1);
+  gain.gain.setValueAtTime(0.08, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+  osc.start(t);
+  osc.stop(t + 0.2);
 }

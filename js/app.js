@@ -40,11 +40,15 @@ editor.onColorPicked = (color) => {
 };
 
 // --- Tools ---
+const canvasWrapperEl = document.querySelector('.canvas-wrapper');
+canvasWrapperEl.dataset.tool = 'pencil';
+
 document.querySelectorAll('.tool-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     editor.setTool(btn.dataset.tool);
+    canvasWrapperEl.dataset.tool = btn.dataset.tool;
     playClick();
   });
 });
@@ -94,6 +98,13 @@ document.getElementById('show-grid').addEventListener('change', (e) => {
   editor.setGridVisible(e.target.checked);
 });
 
+document.getElementById('mirror-mode').addEventListener('change', (e) => {
+  editor.setMirrorMode(e.target.checked);
+  if (e.target.checked) {
+    showToast('Mirror mode ON!', 'info');
+  }
+});
+
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
@@ -108,20 +119,82 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// --- Preview ---
+// --- Preview (Isometric 3D Block) ---
 const previewCanvas = document.getElementById('preview-canvas');
 const previewCtx = previewCanvas.getContext('2d');
+
+function drawIsometricBlock(ctx, texture, cx, cy, size) {
+  // Isometric cube: top face, left face, right face
+  const h = size * 0.5; // half height for iso projection
+
+  // Top face (brighter)
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - h);
+  ctx.lineTo(cx + size, cy);
+  ctx.lineTo(cx, cy + h);
+  ctx.lineTo(cx - size, cy);
+  ctx.closePath();
+  ctx.clip();
+  // Draw texture skewed onto top
+  ctx.setTransform(1, 0.5, -1, 0.5, cx, cy - h);
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(texture, 0, 0, size, size);
+  ctx.restore();
+
+  // Left face (darker)
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(cx - size, cy);
+  ctx.lineTo(cx, cy + h);
+  ctx.lineTo(cx, cy + h + size);
+  ctx.lineTo(cx - size, cy + size);
+  ctx.closePath();
+  ctx.clip();
+  ctx.setTransform(1, 0.5, 0, 1, cx - size, cy);
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(texture, 0, 0, size, size);
+  ctx.restore();
+  // Darken left face
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  ctx.beginPath();
+  ctx.moveTo(cx - size, cy);
+  ctx.lineTo(cx, cy + h);
+  ctx.lineTo(cx, cy + h + size);
+  ctx.lineTo(cx - size, cy + size);
+  ctx.closePath();
+  ctx.fill();
+
+  // Right face (slightly darker)
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(cx + size, cy);
+  ctx.lineTo(cx, cy + h);
+  ctx.lineTo(cx, cy + h + size);
+  ctx.lineTo(cx + size, cy + size);
+  ctx.closePath();
+  ctx.clip();
+  ctx.setTransform(1, -0.5, 0, 1, cx, cy + h);
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(texture, 0, 0, size, size);
+  ctx.restore();
+  // Darken right face
+  ctx.fillStyle = 'rgba(0,0,0,0.15)';
+  ctx.beginPath();
+  ctx.moveTo(cx + size, cy);
+  ctx.lineTo(cx, cy + h);
+  ctx.lineTo(cx, cy + h + size);
+  ctx.lineTo(cx + size, cy + size);
+  ctx.closePath();
+  ctx.fill();
+}
 
 function updatePreview() {
   const textureCanvas = editor.getTextureData();
   previewCtx.imageSmoothingEnabled = false;
   previewCtx.clearRect(0, 0, 192, 192);
-  const tileSize = 64;
-  for (let row = 0; row < 3; row++) {
-    for (let col = 0; col < 3; col++) {
-      previewCtx.drawImage(textureCanvas, col * tileSize, row * tileSize, tileSize, tileSize);
-    }
-  }
+  // Draw isometric 3D block centered
+  drawIsometricBlock(previewCtx, textureCanvas, 96, 46, 80);
   // Auto-save drawing to localStorage (debounced)
   debouncedAutoSave();
 }
@@ -265,7 +338,35 @@ function imageDataToPixels(imageData, size) {
   return pixels;
 }
 
-document.getElementById('btn-add-to-pack').addEventListener('click', () => {
+// --- Confetti Burst ---
+function burstConfetti(originEl) {
+  const rect = originEl.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const colors = ['#4caf50', '#ff9800', '#2196f3', '#e91e63', '#ffeb3b', '#9c27b0'];
+  for (let i = 0; i < 24; i++) {
+    const particle = document.createElement('div');
+    const angle = (Math.PI * 2 * i) / 24 + (Math.random() - 0.5) * 0.5;
+    const dist = 60 + Math.random() * 80;
+    const dx = Math.cos(angle) * dist;
+    const dy = Math.sin(angle) * dist - 40;
+    const size = 6 + Math.random() * 6;
+    particle.style.cssText = `
+      position: fixed; left: ${cx}px; top: ${cy}px; width: ${size}px; height: ${size}px;
+      background: ${colors[i % colors.length]}; border-radius: 2px; z-index: 9999;
+      pointer-events: none; transition: all 0.6s cubic-bezier(.2,.8,.3,1);
+    `;
+    document.body.appendChild(particle);
+    requestAnimationFrame(() => {
+      particle.style.transform = `translate(${dx}px, ${dy}px) rotate(${Math.random() * 360}deg)`;
+      particle.style.opacity = '0';
+    });
+    setTimeout(() => particle.remove(), 700);
+  }
+}
+
+const addToPackBtn = document.getElementById('btn-add-to-pack');
+addToPackBtn.addEventListener('click', () => {
   const target = targetSelect.value;
   const label = targetSelect.options[targetSelect.selectedIndex].text;
   const textureCanvas = editor.getTextureData();
@@ -273,6 +374,7 @@ document.getElementById('btn-add-to-pack').addEventListener('click', () => {
   renderPackTextures();
   savePackToStorage();
   playSuccess();
+  burstConfetti(addToPackBtn);
   showToast(`Added ${label} to your pack!`, 'success');
 });
 
@@ -673,5 +775,5 @@ document.addEventListener('paste', (e) => {
 
 // --- Load saved state on startup ---
 loadFromStorage();
-renderPackTextures();
+renderPackTextures(); // show empty state; loadFromStorage re-renders after images load
 updatePreview();
