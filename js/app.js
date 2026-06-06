@@ -2,6 +2,8 @@ import { PixelEditor } from './pixel-editor.js';
 import { createPalette } from './color-palette.js';
 import { TEMPLATES, TEXTURE_TARGETS, templateToImageData, templateToScaledImageData } from './templates.js';
 import { PackExporter } from './pack-exporter.js';
+import { showToast } from './toast.js';
+import { playPlace, playSuccess, playUndo, playClear, playClick, playError } from './sounds.js';
 
 // --- Init Editor ---
 const pixelCanvas = document.getElementById('pixel-canvas');
@@ -22,7 +24,10 @@ function setColor(color) {
   customColorInput.value = color;
 }
 
-createPalette(paletteContainer, setColor);
+createPalette(paletteContainer, (color) => {
+  setColor(color);
+  playClick();
+});
 
 customColorInput.addEventListener('input', (e) => {
   setColor(e.target.value);
@@ -31,6 +36,7 @@ customColorInput.addEventListener('input', (e) => {
 
 editor.onColorPicked = (color) => {
   setColor(color);
+  showToast('Color picked!', 'info');
 };
 
 // --- Tools ---
@@ -39,6 +45,7 @@ document.querySelectorAll('.tool-btn').forEach(btn => {
     document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     editor.setTool(btn.dataset.tool);
+    playClick();
   });
 });
 
@@ -48,13 +55,41 @@ document.querySelectorAll('.size-btn').forEach(btn => {
     document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     editor.setGridSize(parseInt(btn.dataset.size));
+    playClick();
   });
 });
 
 // --- Controls ---
-document.getElementById('btn-undo').addEventListener('click', () => editor.undo());
-document.getElementById('btn-redo').addEventListener('click', () => editor.redo());
-document.getElementById('btn-clear').addEventListener('click', () => editor.clear());
+document.getElementById('btn-undo').addEventListener('click', () => {
+  editor.undo();
+  playUndo();
+});
+
+document.getElementById('btn-redo').addEventListener('click', () => {
+  editor.redo();
+  playUndo();
+});
+
+document.getElementById('btn-clear').addEventListener('click', () => {
+  if (!confirm('Clear your whole drawing?')) return;
+  editor.clear();
+  playClear();
+  showToast('Canvas cleared!', 'warning');
+});
+
+// --- Flip Buttons ---
+document.getElementById('btn-flip-h').addEventListener('click', () => {
+  editor.flipHorizontal();
+  playClick();
+  showToast('Flipped!', 'info');
+});
+
+document.getElementById('btn-flip-v').addEventListener('click', () => {
+  editor.flipVertical();
+  playClick();
+  showToast('Flipped!', 'info');
+});
+
 document.getElementById('show-grid').addEventListener('change', (e) => {
   editor.setGridVisible(e.target.checked);
 });
@@ -69,6 +104,7 @@ document.addEventListener('keydown', (e) => {
     } else {
       editor.undo();
     }
+    playUndo();
   }
 });
 
@@ -80,13 +116,14 @@ function updatePreview() {
   const textureCanvas = editor.getTextureData();
   previewCtx.imageSmoothingEnabled = false;
   previewCtx.clearRect(0, 0, 192, 192);
-  // Tile 3x3
   const tileSize = 64;
   for (let row = 0; row < 3; row++) {
     for (let col = 0; col < 3; col++) {
       previewCtx.drawImage(textureCanvas, col * tileSize, row * tileSize, tileSize, tileSize);
     }
   }
+  // Auto-save drawing to localStorage (debounced)
+  debouncedAutoSave();
 }
 
 editor.onPreviewUpdate = updatePreview;
@@ -121,18 +158,40 @@ Object.entries(TEMPLATES).forEach(([key, template]) => {
       });
     }
     editor.loadImageData(scaledData);
+    playPlace();
+    showToast(`Loaded ${template.name}!`, 'info');
   });
 
   templateList.appendChild(item);
 });
 
-// --- Texture Target Select ---
+// --- Texture Target Select (grouped with optgroups) ---
 const targetSelect = document.getElementById('texture-target-select');
+
+const groups = {};
 TEXTURE_TARGETS.forEach(target => {
-  const option = document.createElement('option');
-  option.value = target.value;
-  option.textContent = target.label;
-  targetSelect.appendChild(option);
+  const category = target.value.startsWith('block/') ? 'Blocks' :
+    target.value.includes('sword') ? 'Swords' :
+    target.value.includes('pickaxe') ? 'Pickaxes' :
+    target.value.includes('axe') && !target.value.includes('pickaxe') ? 'Axes' :
+    target.value.includes('shovel') ? 'Shovels' :
+    (target.value.includes('bow') || target.value.includes('arrow') || target.value.includes('trident') || target.value.includes('crossbow')) ? 'Ranged Weapons' :
+    (target.value.includes('helmet') || target.value.includes('chestplate') || target.value.includes('leggings') || target.value.includes('boots') || target.value.includes('shield')) ? 'Armor' :
+    'Food & Items';
+  if (!groups[category]) groups[category] = [];
+  groups[category].push(target);
+});
+
+Object.entries(groups).forEach(([groupName, targets]) => {
+  const optgroup = document.createElement('optgroup');
+  optgroup.label = groupName;
+  targets.forEach(target => {
+    const option = document.createElement('option');
+    option.value = target.value;
+    option.textContent = target.label;
+    optgroup.appendChild(option);
+  });
+  targetSelect.appendChild(optgroup);
 });
 
 // --- Pack Management ---
@@ -140,7 +199,12 @@ const packTexturesEl = document.getElementById('pack-textures');
 
 function renderPackTextures() {
   packTexturesEl.innerHTML = '';
-  exporter.getTextures().forEach((tex, index) => {
+  const textures = exporter.getTextures();
+  if (textures.length === 0) {
+    packTexturesEl.innerHTML = '<div class="pack-empty">No textures yet! Draw something and click "Add to Pack"</div>';
+    return;
+  }
+  textures.forEach((tex, index) => {
     const item = document.createElement('div');
     item.className = 'pack-texture-item';
     item.title = tex.name;
@@ -150,7 +214,6 @@ function renderPackTextures() {
     thumbCanvas.height = tex.canvas.height;
     thumbCanvas.getContext('2d').drawImage(tex.canvas, 0, 0);
 
-    // Click to load back into editor
     thumbCanvas.addEventListener('click', () => {
       const imgData = tex.canvas.getContext('2d').getImageData(0, 0, tex.canvas.width, tex.canvas.height);
       editor.setGridSize(tex.canvas.width);
@@ -161,6 +224,8 @@ function renderPackTextures() {
         { pixels: imageDataToPixels(imgData, tex.canvas.width) },
         editor.displaySize
       ));
+      playPlace();
+      showToast(`Loaded ${tex.name}`, 'info');
     });
 
     const removeBtn = document.createElement('button');
@@ -168,8 +233,12 @@ function renderPackTextures() {
     removeBtn.textContent = 'x';
     removeBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      if (!confirm(`Remove ${tex.name} from your pack?`)) return;
       exporter.removeTexture(index);
       renderPackTextures();
+      savePackToStorage();
+      playUndo();
+      showToast(`Removed ${tex.name}`, 'warning');
     });
 
     item.appendChild(thumbCanvas);
@@ -202,36 +271,126 @@ document.getElementById('btn-add-to-pack').addEventListener('click', () => {
   const textureCanvas = editor.getTextureData();
   exporter.addTexture(label, target, textureCanvas);
   renderPackTextures();
+  savePackToStorage();
+  playSuccess();
+  showToast(`Added ${label} to your pack!`, 'success');
 });
 
 document.getElementById('btn-download').addEventListener('click', async () => {
   const packName = document.getElementById('pack-name').value.trim() || 'My Cool Pack';
   try {
     await exporter.exportPack(packName);
+    playSuccess();
+    showToast('Pack downloaded! Check your Downloads folder', 'success');
   } catch (err) {
-    alert(err.message);
+    playError();
+    showToast(err.message, 'error');
   }
 });
+
+// --- localStorage Auto-Save ---
+const STORAGE_KEY = 'mc-texture-maker';
+let autoSaveTimer = null;
+function debouncedAutoSave() {
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer = setTimeout(autoSave, 500);
+}
+
+function autoSave() {
+  try {
+    const dataURL = pixelCanvas.toDataURL('image/png');
+    const saved = {
+      drawing: dataURL,
+      gridSize: editor.gridSize,
+      packName: document.getElementById('pack-name').value,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+  } catch (e) {
+    // localStorage full or unavailable — silently ignore
+  }
+}
+
+function savePackToStorage() {
+  try {
+    const textures = exporter.getTextures().map(tex => ({
+      name: tex.name,
+      targetPath: tex.targetPath,
+      dataURL: tex.canvas.toDataURL('image/png'),
+      width: tex.canvas.width,
+      height: tex.canvas.height,
+    }));
+    localStorage.setItem(STORAGE_KEY + '-pack', JSON.stringify(textures));
+  } catch (e) {
+    // silently ignore
+  }
+}
+
+function loadFromStorage() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (saved) {
+      if (saved.gridSize && saved.gridSize !== editor.gridSize) {
+        editor.setGridSize(saved.gridSize);
+        document.querySelectorAll('.size-btn').forEach(b => {
+          b.classList.toggle('active', parseInt(b.dataset.size) === saved.gridSize);
+        });
+      }
+      if (saved.packName) {
+        document.getElementById('pack-name').value = saved.packName;
+      }
+      if (saved.drawing) {
+        const img = new Image();
+        img.onload = () => {
+          editor.ctx.clearRect(0, 0, editor.displaySize, editor.displaySize);
+          editor.ctx.drawImage(img, 0, 0);
+          updatePreview();
+        };
+        img.src = saved.drawing;
+      }
+    }
+
+    // Restore pack textures
+    const packData = JSON.parse(localStorage.getItem(STORAGE_KEY + '-pack'));
+    if (packData && packData.length > 0) {
+      let loaded = 0;
+      packData.forEach(tex => {
+        const img = new Image();
+        img.onload = () => {
+          const c = document.createElement('canvas');
+          c.width = tex.width;
+          c.height = tex.height;
+          c.getContext('2d').drawImage(img, 0, 0);
+          exporter.addTexture(tex.name, tex.targetPath, c);
+          loaded++;
+          if (loaded === packData.length) renderPackTextures();
+        };
+        img.src = tex.dataURL;
+      });
+    }
+  } catch (e) {
+    // corrupted storage — ignore
+  }
+}
+
+// Save pack name on change
+document.getElementById('pack-name').addEventListener('input', autoSave);
 
 // --- Background Removal ---
 function removeBackground(imageData, width, height) {
   const data = imageData.data;
-  // Sample corners to detect background color
   const corners = [
-    0,                              // top-left
-    (width - 1) * 4,               // top-right
-    (height - 1) * width * 4,      // bottom-left
-    ((height - 1) * width + (width - 1)) * 4, // bottom-right
+    0,
+    (width - 1) * 4,
+    (height - 1) * width * 4,
+    ((height - 1) * width + (width - 1)) * 4,
   ];
-  // Also sample edges (mid-top, mid-bottom, mid-left, mid-right)
   const edges = [
-    (Math.floor(width / 2)) * 4,                          // mid-top
-    ((height - 1) * width + Math.floor(width / 2)) * 4,   // mid-bottom
-    (Math.floor(height / 2) * width) * 4,                  // mid-left
-    (Math.floor(height / 2) * width + (width - 1)) * 4,   // mid-right
+    (Math.floor(width / 2)) * 4,
+    ((height - 1) * width + Math.floor(width / 2)) * 4,
+    (Math.floor(height / 2) * width) * 4,
+    (Math.floor(height / 2) * width + (width - 1)) * 4,
   ];
   const samples = [...corners, ...edges];
-  // Find most common corner/edge color
   const colorCounts = {};
   samples.forEach(i => {
     const key = `${data[i]},${data[i+1]},${data[i+2]}`;
@@ -241,20 +400,19 @@ function removeBackground(imageData, width, height) {
     .sort((a, b) => b[1] - a[1])[0][0]
     .split(',').map(Number);
 
-  // Remove pixels that are close to the background color
   const tolerance = 35;
   for (let i = 0; i < data.length; i += 4) {
     const dr = Math.abs(data[i] - bgColor[0]);
     const dg = Math.abs(data[i+1] - bgColor[1]);
     const db = Math.abs(data[i+2] - bgColor[2]);
     if (dr + dg + db < tolerance) {
-      data[i+3] = 0; // make transparent
+      data[i+3] = 0;
     }
   }
   return imageData;
 }
 
-// --- Object Detection (find separate items in image) ---
+// --- Object Detection ---
 function findObjects(imageData, width, height) {
   const data = imageData.data;
   const labels = new Int32Array(width * height);
@@ -265,7 +423,6 @@ function findObjects(imageData, width, height) {
     return data[(y * width + x) * 4 + 3] > 30;
   }
 
-  // Connected component labeling (flood fill)
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const idx = y * width + x;
@@ -286,7 +443,6 @@ function findObjects(imageData, width, height) {
     }
   }
 
-  // Find bounding boxes for each label
   const boxes = {};
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -304,7 +460,6 @@ function findObjects(imageData, width, height) {
     }
   }
 
-  // Filter out tiny noise (less than 2% of image area)
   const minPixels = width * height * 0.02;
   return Object.values(boxes).filter(b => b.pixelCount >= minPixels);
 }
@@ -313,7 +468,6 @@ function extractObject(img, box, bgRemovedData, srcWidth, srcHeight) {
   const objW = box.maxX - box.minX + 1;
   const objH = box.maxY - box.minY + 1;
   const maxDim = Math.max(objW, objH);
-  // Pad to square with some margin
   const pad = Math.max(2, Math.floor(maxDim * 0.1));
   const squareSize = maxDim + pad * 2;
 
@@ -322,11 +476,9 @@ function extractObject(img, box, bgRemovedData, srcWidth, srcHeight) {
   canvas.height = squareSize;
   const ctx = canvas.getContext('2d');
 
-  // Center the object in the square
   const offsetX = pad + Math.floor((maxDim - objW) / 2);
   const offsetY = pad + Math.floor((maxDim - objH) / 2);
 
-  // Copy only the object pixels from the bg-removed data
   const srcData = bgRemovedData.data;
   const destData = ctx.createImageData(squareSize, squareSize);
   for (let y = box.minY; y <= box.maxY; y++) {
@@ -347,7 +499,6 @@ function extractObject(img, box, bgRemovedData, srcWidth, srcHeight) {
 }
 
 function showObjectPicker(objectCanvases) {
-  // Remove existing picker if any
   const existing = document.getElementById('object-picker-overlay');
   if (existing) existing.remove();
 
@@ -362,7 +513,7 @@ function showObjectPicker(objectCanvases) {
   const title = document.createElement('div');
   title.textContent = 'Pick the one you want!';
   title.style.cssText = `
-    color: white; font-size: 24px; font-weight: bold; margin-bottom: 20px;
+    color: white; font-size: 28px; font-weight: bold; margin-bottom: 20px;
     text-shadow: 2px 2px 0 #1b5e20;
   `;
   overlay.appendChild(title);
@@ -394,7 +545,6 @@ function showObjectPicker(objectCanvases) {
     display.height = 128;
     const dCtx = display.getContext('2d');
     dCtx.imageSmoothingEnabled = false;
-    // Checkerboard background for transparency
     for (let cy = 0; cy < 128; cy += 8) {
       for (let cx = 0; cx < 128; cx += 8) {
         dCtx.fillStyle = ((cx + cy) / 8) % 2 === 0 ? '#666' : '#555';
@@ -408,6 +558,7 @@ function showObjectPicker(objectCanvases) {
     wrapper.addEventListener('click', () => {
       loadSingleObjectToEditor(objCanvas);
       overlay.remove();
+      playPlace();
     });
     grid.appendChild(wrapper);
   });
@@ -417,8 +568,9 @@ function showObjectPicker(objectCanvases) {
   const cancelBtn = document.createElement('button');
   cancelBtn.textContent = 'Cancel';
   cancelBtn.style.cssText = `
-    margin-top: 20px; padding: 10px 30px; border: none; border-radius: 8px;
-    background: #666; color: white; font-size: 16px; cursor: pointer;
+    margin-top: 20px; padding: 12px 36px; border: none; border-radius: 8px;
+    background: #666; color: white; font-size: 18px; cursor: pointer;
+    font-weight: bold;
   `;
   cancelBtn.addEventListener('click', () => overlay.remove());
   overlay.appendChild(cancelBtn);
@@ -439,9 +591,8 @@ function loadSingleObjectToEditor(objCanvas) {
   editor.loadImageData(templateToScaledImageData({ pixels }, editor.displaySize));
 }
 
-// --- Drag & Drop Image onto Canvas ---
+// --- Drag & Drop ---
 function loadImageToEditor(img) {
-  // Work at higher resolution for object detection
   const detectSize = 256;
   const detectCanvas = document.createElement('canvas');
   detectCanvas.width = detectSize;
@@ -455,7 +606,6 @@ function loadImageToEditor(img) {
   const objects = findObjects(detectData, detectSize, detectSize);
 
   if (objects.length <= 1) {
-    // Single object or no objects — load directly
     const size = editor.gridSize;
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = size;
@@ -467,8 +617,10 @@ function loadImageToEditor(img) {
     smallData = removeBackground(smallData, size, size);
     const pixels = imageDataToPixels(smallData, size);
     editor.loadImageData(templateToScaledImageData({ pixels }, editor.displaySize));
+    playPlace();
+    showToast('Image loaded!', 'success');
   } else {
-    // Multiple objects — let kid pick
+    showToast(`Found ${objects.length} items — pick one!`, 'info');
     const objectCanvases = objects.map(box =>
       extractObject(img, box, detectData, detectSize, detectSize)
     );
@@ -493,12 +645,15 @@ canvasWrapper.addEventListener('drop', (e) => {
   const file = e.dataTransfer.files[0];
   if (file && file.type.startsWith('image/')) {
     const img = new Image();
-    img.onload = () => loadImageToEditor(img);
+    img.onload = () => {
+      URL.revokeObjectURL(img.src);
+      loadImageToEditor(img);
+    };
     img.src = URL.createObjectURL(file);
   }
 });
 
-// --- Paste Image (Ctrl+V / Cmd+V) ---
+// --- Paste Image ---
 document.addEventListener('paste', (e) => {
   const items = e.clipboardData.items;
   for (const item of items) {
@@ -506,12 +661,17 @@ document.addEventListener('paste', (e) => {
       e.preventDefault();
       const blob = item.getAsFile();
       const img = new Image();
-      img.onload = () => loadImageToEditor(img);
+      img.onload = () => {
+        URL.revokeObjectURL(img.src);
+        loadImageToEditor(img);
+      };
       img.src = URL.createObjectURL(blob);
       break;
     }
   }
 });
 
-// Initial preview
+// --- Load saved state on startup ---
+loadFromStorage();
+renderPackTextures();
 updatePreview();
