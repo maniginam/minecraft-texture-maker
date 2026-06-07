@@ -1,23 +1,36 @@
 import { PixelEditor } from './pixel-editor.js';
+import { SkinEditor, generateSteveSkin, generateAlexSkin } from './skin-editor.js';
 import { createPalette } from './color-palette.js';
 import { TEMPLATES, TEXTURE_TARGETS, templateToImageData, templateToScaledImageData } from './templates.js';
 import { PackExporter } from './pack-exporter.js';
 import { showToast } from './toast.js';
 import { playPlace, playSuccess, playUndo, playClear, playClick, playError } from './sounds.js';
 
-// --- Init Editor ---
+// ===== TEXTURE EDITOR (RIGHT PANEL) =====
 const pixelCanvas = document.getElementById('pixel-canvas');
 const gridCanvas = document.getElementById('grid-canvas');
 const editor = new PixelEditor(pixelCanvas, gridCanvas, { displaySize: 512, gridSize: 16 });
 const exporter = new PackExporter();
 
-// --- Color Palette ---
+// ===== SKIN EDITOR (LEFT PANEL) =====
+const skinPixelCanvas = document.getElementById('skin-pixel-canvas');
+const skinGridCanvas = document.getElementById('skin-grid-canvas');
+const skinPreviewCanvas = document.getElementById('skin-preview-canvas');
+const skinEditor = new SkinEditor(skinPixelCanvas, skinGridCanvas, skinPreviewCanvas);
+const skinInner = skinEditor.getEditor();
+
+// Track which panel was last active (for keyboard shortcuts)
+let activePanel = 'texture';
+document.getElementById('panel-skins').addEventListener('mousedown', () => { activePanel = 'skin'; });
+document.getElementById('panel-textures').addEventListener('mousedown', () => { activePanel = 'texture'; });
+
+// ===== TEXTURE COLOR PALETTE =====
 const paletteContainer = document.getElementById('color-palette');
 const currentColorEl = document.getElementById('current-color');
 const currentColorLabel = document.getElementById('current-color-label');
 const customColorInput = document.getElementById('custom-color');
 
-function setColor(color) {
+function setTextureColor(color) {
   editor.setColor(color);
   currentColorEl.style.backgroundColor = color;
   currentColorLabel.textContent = color.toUpperCase();
@@ -25,35 +38,71 @@ function setColor(color) {
 }
 
 createPalette(paletteContainer, (color) => {
-  setColor(color);
+  setTextureColor(color);
   playClick();
 });
 
 customColorInput.addEventListener('input', (e) => {
-  setColor(e.target.value);
+  setTextureColor(e.target.value);
   paletteContainer.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
 });
 
 editor.onColorPicked = (color) => {
-  setColor(color);
+  setTextureColor(color);
   showToast('Color picked!', 'info');
 };
 
-// --- Tools ---
-const canvasWrapperEl = document.querySelector('.canvas-wrapper');
-canvasWrapperEl.dataset.tool = 'pencil';
+// ===== SKIN COLOR PALETTE =====
+const skinPaletteContainer = document.getElementById('skin-color-palette');
+const skinCurrentColorEl = document.getElementById('skin-current-color');
+const skinColorLabel = document.getElementById('skin-color-label');
+const skinCustomColorInput = document.getElementById('skin-custom-color');
+
+function setSkinColor(color) {
+  skinInner.setColor(color);
+  skinCurrentColorEl.style.backgroundColor = color;
+  skinColorLabel.textContent = color.toUpperCase();
+  skinCustomColorInput.value = color;
+}
+
+createPalette(skinPaletteContainer, (color) => {
+  setSkinColor(color);
+  playClick();
+});
+
+skinCustomColorInput.addEventListener('input', (e) => {
+  setSkinColor(e.target.value);
+  skinPaletteContainer.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+});
+
+skinInner.onColorPicked = (color) => {
+  setSkinColor(color);
+  showToast('Color picked!', 'info');
+};
+
+// ===== TOOLS (scoped per panel) =====
+const textureCanvasWrapper = document.querySelector('.panel-textures .canvas-wrapper');
+const skinCanvasWrapper = document.querySelector('.panel-skins .skin-canvas-wrapper');
 
 document.querySelectorAll('.tool-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+    const panel = btn.dataset.panel;
+    // Deactivate sibling tools in same panel
+    document.querySelectorAll(`.tool-btn[data-panel="${panel}"]`).forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    editor.setTool(btn.dataset.tool);
-    canvasWrapperEl.dataset.tool = btn.dataset.tool;
+
+    if (panel === 'texture') {
+      editor.setTool(btn.dataset.tool);
+      textureCanvasWrapper.dataset.tool = btn.dataset.tool;
+    } else {
+      skinInner.setTool(btn.dataset.tool);
+      skinCanvasWrapper.dataset.tool = btn.dataset.tool;
+    }
     playClick();
   });
 });
 
-// --- Canvas Size ---
+// ===== TEXTURE CANVAS SIZE =====
 document.querySelectorAll('.size-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
@@ -63,71 +112,68 @@ document.querySelectorAll('.size-btn').forEach(btn => {
   });
 });
 
-// --- Controls ---
-document.getElementById('btn-undo').addEventListener('click', () => {
-  editor.undo();
-  playUndo();
-});
-
-document.getElementById('btn-redo').addEventListener('click', () => {
-  editor.redo();
-  playUndo();
-});
-
+// ===== TEXTURE CONTROLS =====
+document.getElementById('btn-undo').addEventListener('click', () => { editor.undo(); playUndo(); });
+document.getElementById('btn-redo').addEventListener('click', () => { editor.redo(); playUndo(); });
 document.getElementById('btn-clear').addEventListener('click', () => {
   if (!confirm('Clear your whole drawing?')) return;
   editor.clear();
   playClear();
   showToast('Canvas cleared!', 'warning');
 });
-
-// --- Flip Buttons ---
 document.getElementById('btn-flip-h').addEventListener('click', () => {
-  editor.flipHorizontal();
-  playClick();
-  showToast('Flipped!', 'info');
+  editor.flipHorizontal(); playClick(); showToast('Flipped!', 'info');
 });
-
 document.getElementById('btn-flip-v').addEventListener('click', () => {
-  editor.flipVertical();
-  playClick();
-  showToast('Flipped!', 'info');
+  editor.flipVertical(); playClick(); showToast('Flipped!', 'info');
 });
-
-document.getElementById('show-grid').addEventListener('change', (e) => {
-  editor.setGridVisible(e.target.checked);
-});
-
+document.getElementById('show-grid').addEventListener('change', (e) => { editor.setGridVisible(e.target.checked); });
 document.getElementById('mirror-mode').addEventListener('change', (e) => {
   editor.setMirrorMode(e.target.checked);
-  if (e.target.checked) {
-    showToast('Mirror mode ON!', 'info');
-  }
+  if (e.target.checked) showToast('Mirror mode ON!', 'info');
 });
 
-// Keyboard shortcuts
+// ===== SKIN CONTROLS =====
+document.getElementById('skin-undo').addEventListener('click', () => { skinInner.undo(); playUndo(); });
+document.getElementById('skin-redo').addEventListener('click', () => { skinInner.redo(); playUndo(); });
+document.getElementById('skin-clear').addEventListener('click', () => {
+  if (!confirm('Clear your whole skin?')) return;
+  skinInner.clear();
+  skinEditor.refreshOverlay();
+  playClear();
+  showToast('Skin cleared!', 'warning');
+});
+document.getElementById('skin-flip-h').addEventListener('click', () => {
+  skinInner.flipHorizontal(); playClick(); showToast('Flipped!', 'info');
+});
+document.getElementById('skin-show-grid').addEventListener('change', (e) => {
+  skinInner.setGridVisible(e.target.checked);
+  skinEditor.refreshOverlay();
+});
+document.getElementById('skin-mirror').addEventListener('change', (e) => {
+  skinInner.setMirrorMode(e.target.checked);
+  if (e.target.checked) showToast('Mirror mode ON!', 'info');
+});
+
+// ===== KEYBOARD SHORTCUTS =====
 document.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
   if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
     e.preventDefault();
-    if (e.shiftKey) {
-      editor.redo();
-    } else {
-      editor.undo();
-    }
+    const ed = activePanel === 'skin' ? skinInner : editor;
+    if (e.shiftKey) { ed.redo(); } else { ed.undo(); }
     playUndo();
   }
 });
 
-// --- Preview (Isometric 3D Block) ---
+// ===== TEXTURE PREVIEW (Isometric 3D Block) =====
 const previewCanvas = document.getElementById('preview-canvas');
 const previewCtx = previewCanvas.getContext('2d');
 
 function drawIsometricBlock(ctx, texture, cx, cy, size) {
-  // Isometric cube: top face, left face, right face
-  const h = size * 0.5; // half height for iso projection
+  const h = size * 0.5;
 
-  // Top face (brighter)
+  // Top face
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(cx, cy - h);
@@ -136,13 +182,12 @@ function drawIsometricBlock(ctx, texture, cx, cy, size) {
   ctx.lineTo(cx - size, cy);
   ctx.closePath();
   ctx.clip();
-  // Draw texture skewed onto top
   ctx.setTransform(1, 0.5, -1, 0.5, cx, cy - h);
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(texture, 0, 0, size, size);
   ctx.restore();
 
-  // Left face (darker)
+  // Left face
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(cx - size, cy);
@@ -155,7 +200,6 @@ function drawIsometricBlock(ctx, texture, cx, cy, size) {
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(texture, 0, 0, size, size);
   ctx.restore();
-  // Darken left face
   ctx.fillStyle = 'rgba(0,0,0,0.25)';
   ctx.beginPath();
   ctx.moveTo(cx - size, cy);
@@ -165,7 +209,7 @@ function drawIsometricBlock(ctx, texture, cx, cy, size) {
   ctx.closePath();
   ctx.fill();
 
-  // Right face (slightly darker)
+  // Right face
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(cx + size, cy);
@@ -178,7 +222,6 @@ function drawIsometricBlock(ctx, texture, cx, cy, size) {
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(texture, 0, 0, size, size);
   ctx.restore();
-  // Darken right face
   ctx.fillStyle = 'rgba(0,0,0,0.15)';
   ctx.beginPath();
   ctx.moveTo(cx + size, cy);
@@ -189,19 +232,17 @@ function drawIsometricBlock(ctx, texture, cx, cy, size) {
   ctx.fill();
 }
 
-function updatePreview() {
+function updateTexturePreview() {
   const textureCanvas = editor.getTextureData();
   previewCtx.imageSmoothingEnabled = false;
   previewCtx.clearRect(0, 0, 192, 192);
-  // Draw isometric 3D block centered
   drawIsometricBlock(previewCtx, textureCanvas, 96, 46, 80);
-  // Auto-save drawing to localStorage (debounced)
   debouncedAutoSave();
 }
 
-editor.onPreviewUpdate = updatePreview;
+editor.onPreviewUpdate = updateTexturePreview;
 
-// --- Templates ---
+// ===== TEXTURE TEMPLATES =====
 const templateList = document.getElementById('template-list');
 
 Object.entries(TEMPLATES).forEach(([key, template]) => {
@@ -211,10 +252,7 @@ Object.entries(TEMPLATES).forEach(([key, template]) => {
   const thumbCanvas = document.createElement('canvas');
   thumbCanvas.width = 16;
   thumbCanvas.height = 16;
-  const thumbCtx = thumbCanvas.getContext('2d');
-
-  const imgData = templateToImageData(template);
-  thumbCtx.putImageData(imgData, 0, 0);
+  thumbCanvas.getContext('2d').putImageData(templateToImageData(template), 0, 0);
 
   const label = document.createElement('span');
   label.textContent = template.name;
@@ -238,7 +276,68 @@ Object.entries(TEMPLATES).forEach(([key, template]) => {
   templateList.appendChild(item);
 });
 
-// --- Texture Target Select (grouped with optgroups) ---
+// ===== SKIN TEMPLATES =====
+function loadSkinTemplate(pixels) {
+  const size = 64;
+  const imgData = new ImageData(size, size);
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const color = pixels[y] && pixels[y][x];
+      if (!color) continue;
+      const i = (y * size + x) * 4;
+      const r = parseInt(color.slice(1, 3), 16);
+      const g = parseInt(color.slice(3, 5), 16);
+      const b = parseInt(color.slice(5, 7), 16);
+      imgData.data[i] = r;
+      imgData.data[i + 1] = g;
+      imgData.data[i + 2] = b;
+      imgData.data[i + 3] = 255;
+    }
+  }
+  // Scale to display size
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = size;
+  tempCanvas.height = size;
+  tempCanvas.getContext('2d').putImageData(imgData, 0, 0);
+
+  const scaled = document.createElement('canvas');
+  scaled.width = 512;
+  scaled.height = 512;
+  const sCtx = scaled.getContext('2d');
+  sCtx.imageSmoothingEnabled = false;
+  sCtx.drawImage(tempCanvas, 0, 0, 512, 512);
+
+  skinInner.loadImageData(sCtx.getImageData(0, 0, 512, 512));
+  skinEditor.refreshOverlay();
+  playPlace();
+}
+
+document.querySelectorAll('.skin-template-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const skin = btn.dataset.skin;
+    if (skin === 'steve') {
+      loadSkinTemplate(generateSteveSkin());
+      showToast('Loaded Steve!', 'info');
+    } else if (skin === 'alex') {
+      loadSkinTemplate(generateAlexSkin());
+      showToast('Loaded Alex!', 'info');
+    } else {
+      skinInner.clear();
+      skinEditor.refreshOverlay();
+      showToast('Blank skin!', 'info');
+    }
+  });
+});
+
+// ===== SKIN DOWNLOAD =====
+document.getElementById('btn-download-skin').addEventListener('click', () => {
+  const name = document.getElementById('skin-name').value.trim() || 'my-skin';
+  skinEditor.downloadSkin(name);
+  playSuccess();
+  showToast('Skin downloaded!', 'success');
+});
+
+// ===== TEXTURE TARGET SELECT (grouped) =====
 const targetSelect = document.getElementById('texture-target-select');
 
 const groups = {};
@@ -267,7 +366,7 @@ Object.entries(groups).forEach(([groupName, targets]) => {
   targetSelect.appendChild(optgroup);
 });
 
-// --- Pack Management ---
+// ===== PACK MANAGEMENT =====
 const packTexturesEl = document.getElementById('pack-textures');
 
 function renderPackTextures() {
@@ -338,7 +437,7 @@ function imageDataToPixels(imageData, size) {
   return pixels;
 }
 
-// --- Confetti Burst ---
+// ===== CONFETTI =====
 function burstConfetti(originEl) {
   const rect = originEl.getBoundingClientRect();
   const cx = rect.left + rect.width / 2;
@@ -390,7 +489,7 @@ document.getElementById('btn-download').addEventListener('click', async () => {
   }
 });
 
-// --- localStorage Auto-Save ---
+// ===== localStorage AUTO-SAVE =====
 const STORAGE_KEY = 'mc-texture-maker';
 let autoSaveTimer = null;
 function debouncedAutoSave() {
@@ -401,14 +500,17 @@ function debouncedAutoSave() {
 function autoSave() {
   try {
     const dataURL = pixelCanvas.toDataURL('image/png');
+    const skinDataURL = skinPixelCanvas.toDataURL('image/png');
     const saved = {
       drawing: dataURL,
       gridSize: editor.gridSize,
       packName: document.getElementById('pack-name').value,
+      skinDrawing: skinDataURL,
+      skinName: document.getElementById('skin-name').value,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
   } catch (e) {
-    // localStorage full or unavailable — silently ignore
+    // localStorage full or unavailable
   }
 }
 
@@ -440,14 +542,26 @@ function loadFromStorage() {
       if (saved.packName) {
         document.getElementById('pack-name').value = saved.packName;
       }
+      if (saved.skinName) {
+        document.getElementById('skin-name').value = saved.skinName;
+      }
       if (saved.drawing) {
         const img = new Image();
         img.onload = () => {
           editor.ctx.clearRect(0, 0, editor.displaySize, editor.displaySize);
           editor.ctx.drawImage(img, 0, 0);
-          updatePreview();
+          updateTexturePreview();
         };
         img.src = saved.drawing;
+      }
+      if (saved.skinDrawing) {
+        const img = new Image();
+        img.onload = () => {
+          skinInner.ctx.clearRect(0, 0, skinInner.displaySize, skinInner.displaySize);
+          skinInner.ctx.drawImage(img, 0, 0);
+          skinEditor.updatePreview();
+        };
+        img.src = saved.skinDrawing;
       }
     }
 
@@ -470,14 +584,21 @@ function loadFromStorage() {
       });
     }
   } catch (e) {
-    // corrupted storage — ignore
+    // corrupted storage
   }
 }
 
-// Save pack name on change
+// Save on name changes
 document.getElementById('pack-name').addEventListener('input', autoSave);
+document.getElementById('skin-name').addEventListener('input', autoSave);
 
-// --- Background Removal ---
+// Also save skin on every skin edit
+skinInner.onPreviewUpdate = () => {
+  skinEditor.updatePreview();
+  debouncedAutoSave();
+};
+
+// ===== BACKGROUND REMOVAL =====
 function removeBackground(imageData, width, height) {
   const data = imageData.data;
   const corners = [
@@ -514,7 +635,7 @@ function removeBackground(imageData, width, height) {
   return imageData;
 }
 
-// --- Object Detection ---
+// ===== OBJECT DETECTION =====
 function findObjects(imageData, width, height) {
   const data = imageData.data;
   const labels = new Int32Array(width * height);
@@ -693,7 +814,7 @@ function loadSingleObjectToEditor(objCanvas) {
   editor.loadImageData(templateToScaledImageData({ pixels }, editor.displaySize));
 }
 
-// --- Drag & Drop ---
+// ===== DRAG & DROP (texture panel only) =====
 function loadImageToEditor(img) {
   const detectSize = 256;
   const detectCanvas = document.createElement('canvas');
@@ -730,20 +851,18 @@ function loadImageToEditor(img) {
   }
 }
 
-const canvasWrapper = document.querySelector('.canvas-wrapper');
-
-canvasWrapper.addEventListener('dragover', (e) => {
+textureCanvasWrapper.addEventListener('dragover', (e) => {
   e.preventDefault();
-  canvasWrapper.style.outline = '3px dashed #4caf50';
+  textureCanvasWrapper.style.outline = '3px dashed #4caf50';
 });
 
-canvasWrapper.addEventListener('dragleave', () => {
-  canvasWrapper.style.outline = '';
+textureCanvasWrapper.addEventListener('dragleave', () => {
+  textureCanvasWrapper.style.outline = '';
 });
 
-canvasWrapper.addEventListener('drop', (e) => {
+textureCanvasWrapper.addEventListener('drop', (e) => {
   e.preventDefault();
-  canvasWrapper.style.outline = '';
+  textureCanvasWrapper.style.outline = '';
   const file = e.dataTransfer.files[0];
   if (file && file.type.startsWith('image/')) {
     const img = new Image();
@@ -755,7 +874,7 @@ canvasWrapper.addEventListener('drop', (e) => {
   }
 });
 
-// --- Paste Image ---
+// Paste goes to texture editor
 document.addEventListener('paste', (e) => {
   const items = e.clipboardData.items;
   for (const item of items) {
@@ -773,7 +892,42 @@ document.addEventListener('paste', (e) => {
   }
 });
 
-// --- Load saved state on startup ---
+// ===== SPLIT DIVIDER DRAG =====
+const divider = document.getElementById('split-divider');
+const skinPanel = document.getElementById('panel-skins');
+const texturePanel = document.getElementById('panel-textures');
+const splitContainer = document.querySelector('.split-container');
+
+let isDragging = false;
+
+divider.addEventListener('mousedown', (e) => {
+  e.preventDefault();
+  isDragging = true;
+  document.body.style.cursor = 'col-resize';
+  document.body.style.userSelect = 'none';
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  const containerRect = splitContainer.getBoundingClientRect();
+  const x = e.clientX - containerRect.left;
+  const total = containerRect.width - 8; // minus divider width
+  const pct = Math.max(20, Math.min(80, (x / containerRect.width) * 100));
+  skinPanel.style.flex = 'none';
+  skinPanel.style.width = pct + '%';
+  texturePanel.style.flex = 'none';
+  texturePanel.style.width = (100 - pct) + '%';
+});
+
+document.addEventListener('mouseup', () => {
+  if (isDragging) {
+    isDragging = false;
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  }
+});
+
+// ===== STARTUP =====
 loadFromStorage();
-renderPackTextures(); // show empty state; loadFromStorage re-renders after images load
-updatePreview();
+renderPackTextures();
+updateTexturePreview();
