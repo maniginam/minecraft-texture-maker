@@ -1,0 +1,1202 @@
+[
+  {
+    "name": "Blaze Warrior",
+    "filename": "ff-blaze-warrior.png",
+    "category": "FlameFrags Style",
+    "description": "Black PvP armor with orange flame accents and ember eyes"
+  },
+  {
+    "name": "Ember Mage",
+    "filename": "ff-ember-mage.png",
+    "category": "FlameFrags Style",
+    "description": "Dark hooded fire mage with glowing flame runes"
+  },
+  {
+    "name": "Inferno Knight",
+    "filename": "ff-inferno-knight.png",
+    "category": "FlameFrags Style",
+    "description": "Heavy armor with molten lava cracks glowing through"
+  },
+  {
+    "name": "Scorched Assassin",
+    "filename": "ff-scorched-assassin.png",
+    "category": "FlameFrags Style",
+    "description": "Sleek dark ninja with ember wraps and glowing eyes"
+  },
+  {
+    "name": "Phoenix Archer",
+    "filename": "ff-phoenix-archer.png",
+    "category": "FlameFrags Style",
+    "description": "Red-orange gradient archer with fiery hair and quiver"
+  },
+  {
+    "name": "Cinder Tank",
+    "filename": "ff-cinder-tank.png",
+    "category": "FlameFrags Style",
+    "description": "Bulky iron armor with glowing flame core in chest"
+  },
+  {
+    "name": "Pastel Bunny",
+    "filename": "pd-pastel-bunny.png",
+    "category": "Pastel Dreams",
+    "description": "Soft pink bunny with floppy ears and blushing cheeks"
+  },
+  {
+    "name": "Cloud Walker",
+    "filename": "pd-cloud-walker.png",
+    "category": "Pastel Dreams",
+    "description": "Dreamy sky blue and white cloud-themed character"
+  },
+  {
+    "name": "Lavender Witch",
+    "filename": "pd-lavender-witch.png",
+    "category": "Pastel Dreams",
+    "description": "Soft purple witch with flower-topped pointed hat"
+  },
+  {
+    "name": "Mint Frog",
+    "filename": "pd-mint-frog.png",
+    "category": "Pastel Dreams",
+    "description": "Cute mint green froggy with big eyes and wide smile"
+  },
+  {
+    "name": "Peach Bear",
+    "filename": "pd-peach-bear.png",
+    "category": "Pastel Dreams",
+    "description": "Warm peachy teddy bear with round ears and cream belly"
+  },
+  {
+    "name": "Strawberry",
+    "filename": "pd-strawberry.png",
+    "category": "Pastel Dreams",
+    "description": "Red-pink strawberry character with green leaf hat and seeds"
+  },
+  {
+    "name": "Neon Hacker",
+    "filename": "nn-neon-hacker.png",
+    "category": "Neon Nights",
+    "description": "Black outfit with cyan and green circuit board lines"
+  },
+  {
+    "name": "Neon Racer",
+    "filename": "nn-neon-racer.png",
+    "category": "Neon Nights",
+    "description": "Racing suit with magenta and purple neon stripes"
+  },
+  {
+    "name": "Neon DJ",
+    "filename": "nn-neon-dj.png",
+    "category": "Neon Nights",
+    "description": "Dark outfit with multicolor EQ bars and neon headphones"
+  },
+  {
+    "name": "Neon Samurai",
+    "filename": "nn-neon-samurai.png",
+    "category": "Neon Nights",
+    "description": "Dark samurai armor with blue neon edge glow"
+  },
+  {
+    "name": "Neon Witch",
+    "filename": "nn-neon-witch.png",
+    "category": "Neon Nights",
+    "description": "Dark robes with glowing green potion aura and pointy hat"
+  },
+  {
+    "name": "Neon Phantom",
+    "filename": "nn-neon-phantom.png",
+    "category": "Neon Nights",
+    "description": "Ghostly void form outlined in purple neon glow"
+  },
+  {
+    "name": "Garden Keeper",
+    "filename": "cc-gardener.png",
+    "category": "Cottagecore",
+    "description": "Straw hat, white shirt, and denim overalls with boots"
+  },
+  {
+    "name": "Village Baker",
+    "filename": "cc-baker.png",
+    "category": "Cottagecore",
+    "description": "Flour-dusted baker with chef hat and cream apron"
+  },
+  {
+    "name": "Beekeeper",
+    "filename": "cc-beekeeper.png",
+    "category": "Cottagecore",
+    "description": "White beekeeper suit with mesh veil and honeycomb accents"
+  },
+  {
+    "name": "Mushroom Friend",
+    "filename": "cc-mushroom.png",
+    "category": "Cottagecore",
+    "description": "Red mushroom cap with white dots, cream body"
+  },
+  {
+    "name": "Forest Fox",
+    "filename": "cc-fox.png",
+    "category": "Cottagecore",
+    "description": "Warm orange fox with pointed ears and cream belly"
+  },
+  {
+    "name": "Woodland Deer",
+    "filename": "cc-deer.png",
+    "category": "Cottagecore",
+    "description": "Brown deer with antlers, white spots, and cream belly"
+  },
+  {
+    "name": "Hollow",
+    "filename": "ds-hollow.png",
+    "category": "Dark Souls",
+    "description": "Gaunt undead warrior in tattered rags with red eyes"
+  },
+  {
+    "name": "Abyss Knight",
+    "filename": "ds-abyss-knight.png",
+    "category": "Dark Souls",
+    "description": "Jet black armor with faint blue abyss glow"
+  },
+  {
+    "name": "Pyromancer",
+    "filename": "ds-pyromancer.png",
+    "category": "Dark Souls",
+    "description": "Tattered dark robes with flame burning in hand"
+  },
+  {
+    "name": "Bonfire Keeper",
+    "filename": "ds-bonfire-keeper.png",
+    "category": "Dark Souls",
+    "description": "Pale robed keeper with warm golden glow at center"
+  },
+  {
+    "name": "Crystal Sage",
+    "filename": "ds-crystal-sage.png",
+    "category": "Dark Souls",
+    "description": "Dark robes with glowing crystal shards and crown"
+  },
+  {
+    "name": "Grave Warden",
+    "filename": "ds-grave-warden.png",
+    "category": "Dark Souls",
+    "description": "Hooded figure with chain mail and deep cowl"
+  },
+  {
+    "name": "Tech Girl",
+    "filename": "yt-tech-girl.png",
+    "category": "YouTuber Styles",
+    "description": "Dark-haired developer with glasses and cyan tech-icon dress"
+  },
+  {
+    "name": "Rottweiler",
+    "filename": "yt-rottweiler.png",
+    "category": "Animals",
+    "description": "Black and tan Rottweiler with floppy ears and fierce look"
+  },
+  {
+    "name": "T-Rex",
+    "filename": "yt-trex.png",
+    "category": "Animals",
+    "description": "Green scaled T-Rex with sharp teeth and tiny arms"
+  },
+  {
+    "name": "Lion",
+    "filename": "yt-lion.png",
+    "category": "Animals",
+    "description": "Golden lion with dark flowing mane and amber eyes"
+  },
+  {
+    "name": "Bald Eagle",
+    "filename": "yt-bald-eagle.png",
+    "category": "Animals",
+    "description": "Majestic bald eagle with white head, brown body, yellow talons"
+  },
+  {
+    "name": "Dream Style",
+    "filename": "yt-dream-style.png",
+    "category": "YouTuber Styles",
+    "description": "Green hoodie with iconic smiley face mask \u2014 inspired by Dream"
+  },
+  {
+    "name": "ClownPierce Style",
+    "filename": "yt-clownpierce-style.png",
+    "category": "YouTuber Styles",
+    "description": "Dark knight armor with red accents and menacing helmet \u2014 inspired by ClownPierce"
+  },
+  {
+    "name": "Evbo Style",
+    "filename": "yt-evbo-style.png",
+    "category": "YouTuber Styles",
+    "description": "Mysterious dark hooded figure with purple accents \u2014 inspired by Evbo"
+  },
+  {
+    "name": "Sharkillz Style",
+    "filename": "yt-sharkillz-style.png",
+    "category": "YouTuber Styles",
+    "description": "Shark-themed skin with dorsal fin and razor teeth \u2014 inspired by Sharkillz"
+  },
+  {
+    "name": "Camaflog Style",
+    "filename": "yt-camaflog-style.png",
+    "category": "YouTuber Styles",
+    "description": "Full military camouflage outfit with beret \u2014 inspired by Camaflog"
+  },
+  {
+    "name": "Iron Knight",
+    "filename": "iron-knight.png",
+    "category": "Warriors",
+    "description": "Blazing iron armor forged in hellfire"
+  },
+  {
+    "name": "Golden Paladin",
+    "filename": "golden-paladin.png",
+    "category": "Warriors",
+    "description": "Molten gold armor dripping with fire"
+  },
+  {
+    "name": "Dark Berserker",
+    "filename": "dark-berserker.png",
+    "category": "Warriors",
+    "description": "Rage-fueled demon warrior of destruction"
+  },
+  {
+    "name": "Crystal Guardian",
+    "filename": "crystal-guardian.png",
+    "category": "Warriors",
+    "description": "Dark crystal armor with molten core"
+  },
+  {
+    "name": "Blood Knight",
+    "filename": "blood-knight.png",
+    "category": "Warriors",
+    "description": "Armor soaked in dragon blood, burns eternally"
+  },
+  {
+    "name": "Storm Warrior",
+    "filename": "storm-warrior.png",
+    "category": "Warriors",
+    "description": "Lightning-charged armor of pure destruction"
+  },
+  {
+    "name": "Emerald Sentinel",
+    "filename": "emerald-sentinel.png",
+    "category": "Warriors",
+    "description": "Toxic green warrior with acid veins"
+  },
+  {
+    "name": "Bone Reaver",
+    "filename": "bone-reaver.png",
+    "category": "Warriors",
+    "description": "Wears skulls of slain dragons as armor"
+  },
+  {
+    "name": "Void Champion",
+    "filename": "void-champion.png",
+    "category": "Warriors",
+    "description": "End-dimension warrior of ultimate darkness"
+  },
+  {
+    "name": "Samurai",
+    "filename": "samurai.png",
+    "category": "Warriors",
+    "description": "Flaming katana demon samurai of death"
+  },
+  {
+    "name": "Fire Mage",
+    "filename": "fire-mage.png",
+    "category": "Mages",
+    "description": "ULTIMATE fire lord \u2014 everything burns"
+  },
+  {
+    "name": "Ice Sorceress",
+    "filename": "ice-sorceress.png",
+    "category": "Mages",
+    "description": "Frozen death \u2014 eyes of pure blizzard"
+  },
+  {
+    "name": "Shadow Warlock",
+    "filename": "shadow-warlock.png",
+    "category": "Mages",
+    "description": "Void magic tears reality apart"
+  },
+  {
+    "name": "Nature Druid",
+    "filename": "nature-druid.png",
+    "category": "Mages",
+    "description": "Toxic swamp lord with poison vines"
+  },
+  {
+    "name": "Lightning Wizard",
+    "filename": "lightning-wizard.png",
+    "category": "Mages",
+    "description": "Pure electrical death \u2014 vaporizes everything"
+  },
+  {
+    "name": "Blood Mage",
+    "filename": "blood-mage.png",
+    "category": "Mages",
+    "description": "Forbidden blood magic \u2014 drains souls"
+  },
+  {
+    "name": "Arcane Scholar",
+    "filename": "arcane-scholar.png",
+    "category": "Mages",
+    "description": "Ancient forbidden knowledge \u2014 reality bender"
+  },
+  {
+    "name": "Sun Priest",
+    "filename": "sun-priest.png",
+    "category": "Mages",
+    "description": "Solar flare \u2014 blinds enemies with light"
+  },
+  {
+    "name": "Necromancer",
+    "filename": "necromancer.png",
+    "category": "Mages",
+    "description": "Death lord \u2014 armies of the undead"
+  },
+  {
+    "name": "Enchantress",
+    "filename": "enchantress.png",
+    "category": "Mages",
+    "description": "Bewitching dark magic \u2014 controls minds"
+  },
+  {
+    "name": "Explorer",
+    "filename": "explorer.png",
+    "category": "Adventurers",
+    "description": "Trailblazer through forbidden dimensions"
+  },
+  {
+    "name": "Sky Pirate",
+    "filename": "sky-pirate.png",
+    "category": "Adventurers",
+    "description": "Lightning-riding sky bandit"
+  },
+  {
+    "name": "Treasure Hunter",
+    "filename": "treasure-hunter.png",
+    "category": "Adventurers",
+    "description": "Curses mean nothing \u2014 takes all gold"
+  },
+  {
+    "name": "Desert Nomad",
+    "filename": "desert-nomad.png",
+    "category": "Adventurers",
+    "description": "Sandstorm summoner \u2014 buries cities"
+  },
+  {
+    "name": "Arctic Ranger",
+    "filename": "arctic-ranger.png",
+    "category": "Adventurers",
+    "description": "Blizzard hunter \u2014 freezes prey solid"
+  },
+  {
+    "name": "Jungle Scout",
+    "filename": "jungle-scout.png",
+    "category": "Adventurers",
+    "description": "Venomous predator \u2014 silent and deadly"
+  },
+  {
+    "name": "Mountain Climber",
+    "filename": "mountain-climber.png",
+    "category": "Adventurers",
+    "description": "Scales volcanoes \u2014 fireproof gear"
+  },
+  {
+    "name": "Cave Spelunker",
+    "filename": "cave-spelunker.png",
+    "category": "Adventurers",
+    "description": "Mines in the dark \u2014 finds cursed gems"
+  },
+  {
+    "name": "Sea Captain",
+    "filename": "sea-captain.png",
+    "category": "Adventurers",
+    "description": "Commands ghost fleet \u2014 rules cursed waters"
+  },
+  {
+    "name": "Caravan Trader",
+    "filename": "caravan-trader.png",
+    "category": "Adventurers",
+    "description": "Sells forbidden enchanted artifacts"
+  },
+  {
+    "name": "Zombie",
+    "filename": "zombie.png",
+    "category": "Monsters",
+    "description": "Undead terror \u2014 relentless and unstoppable"
+  },
+  {
+    "name": "Skeleton King",
+    "filename": "skeleton-king.png",
+    "category": "Monsters",
+    "description": "Bone throne ruler \u2014 commands undead armies"
+  },
+  {
+    "name": "Creeper Boss",
+    "filename": "creeper-boss.png",
+    "category": "Monsters",
+    "description": "MEGA creeper \u2014 explosion destroys everything"
+  },
+  {
+    "name": "Enderman Noble",
+    "filename": "enderman-noble.png",
+    "category": "Monsters",
+    "description": "Ender dimension royalty \u2014 teleports at will"
+  },
+  {
+    "name": "Blaze Lord",
+    "filename": "blaze-lord.png",
+    "category": "Monsters",
+    "description": "Fire dimension overlord \u2014 pure flame"
+  },
+  {
+    "name": "Wither Knight",
+    "filename": "wither-knight.png",
+    "category": "Monsters",
+    "description": "Three-headed death \u2014 withers everything"
+  },
+  {
+    "name": "Spider Queen",
+    "filename": "spider-queen.png",
+    "category": "Monsters",
+    "description": "Web of death \u2014 poisons everything"
+  },
+  {
+    "name": "Phantom Shade",
+    "filename": "phantom-shade.png",
+    "category": "Monsters",
+    "description": "Flies through walls \u2014 steals souls"
+  },
+  {
+    "name": "Slime Prince",
+    "filename": "slime-prince.png",
+    "category": "Monsters",
+    "description": "Acid slime royalty \u2014 dissolves steel"
+  },
+  {
+    "name": "Magma Golem",
+    "filename": "magma-golem.png",
+    "category": "Monsters",
+    "description": "Living volcano \u2014 erupts on contact"
+  },
+  {
+    "name": "King",
+    "filename": "king.png",
+    "category": "Royalty",
+    "description": "Dark king \u2014 rules with iron flame fist"
+  },
+  {
+    "name": "Queen",
+    "filename": "queen.png",
+    "category": "Royalty",
+    "description": "Shadow queen \u2014 darkness obeys her command"
+  },
+  {
+    "name": "Prince",
+    "filename": "prince.png",
+    "category": "Royalty",
+    "description": "Lightning prince \u2014 storms follow him"
+  },
+  {
+    "name": "Princess",
+    "filename": "princess.png",
+    "category": "Royalty",
+    "description": "Fire princess \u2014 commands dragon armies"
+  },
+  {
+    "name": "Emperor",
+    "filename": "emperor.png",
+    "category": "Royalty",
+    "description": "Supreme ruler \u2014 all elements obey"
+  },
+  {
+    "name": "Court Jester",
+    "filename": "court-jester.png",
+    "category": "Royalty",
+    "description": "Chaos jester \u2014 tricks are deadly explosions"
+  },
+  {
+    "name": "Royal Guard",
+    "filename": "royal-guard.png",
+    "category": "Royalty",
+    "description": "Elite guard \u2014 lightning-infused armor"
+  },
+  {
+    "name": "Noble Duke",
+    "filename": "noble-duke.png",
+    "category": "Royalty",
+    "description": "Dark duke \u2014 poisons rivals with style"
+  },
+  {
+    "name": "Elven Lord",
+    "filename": "elven-lord.png",
+    "category": "Royalty",
+    "description": "Ancient elf king \u2014 nature's wrath"
+  },
+  {
+    "name": "Dark Empress",
+    "filename": "dark-empress.png",
+    "category": "Royalty",
+    "description": "Void empress \u2014 reality bends to her will"
+  },
+  {
+    "name": "Space Marine",
+    "filename": "space-marine.png",
+    "category": "Sci-Fi",
+    "description": "Plasma cannon \u2014 burns through starships"
+  },
+  {
+    "name": "Cyber Ninja",
+    "filename": "cyber-ninja.png",
+    "category": "Sci-Fi",
+    "description": "Neon blade \u2014 hacks and slashes"
+  },
+  {
+    "name": "Alien Commander",
+    "filename": "alien-commander.png",
+    "category": "Sci-Fi",
+    "description": "Fleet commander \u2014 orbital bombardment"
+  },
+  {
+    "name": "Robot MK-7",
+    "filename": "robot-mk-7.png",
+    "category": "Sci-Fi",
+    "description": "War machine \u2014 laser eyes melt steel"
+  },
+  {
+    "name": "Neon Hacker",
+    "filename": "neon-hacker.png",
+    "category": "Sci-Fi",
+    "description": "Glitch lord \u2014 controls the matrix"
+  },
+  {
+    "name": "Void Pilot",
+    "filename": "void-pilot.png",
+    "category": "Sci-Fi",
+    "description": "Flies through black holes \u2014 no fear"
+  },
+  {
+    "name": "Plasma Engineer",
+    "filename": "plasma-engineer.png",
+    "category": "Sci-Fi",
+    "description": "Builds weapons of mass destruction"
+  },
+  {
+    "name": "Clone Trooper",
+    "filename": "clone-trooper.png",
+    "category": "Sci-Fi",
+    "description": "Elite clone army \u2014 perfect warriors"
+  },
+  {
+    "name": "Mech Pilot",
+    "filename": "mech-pilot.png",
+    "category": "Sci-Fi",
+    "description": "Giant mech \u2014 crushes cities"
+  },
+  {
+    "name": "Quantum Sage",
+    "filename": "quantum-sage.png",
+    "category": "Sci-Fi",
+    "description": "Bends spacetime \u2014 exists everywhere at once"
+  },
+  {
+    "name": "Forest Spirit",
+    "filename": "forest-spirit.png",
+    "category": "Nature",
+    "description": "Ancient tree spirit \u2014 vines crush enemies"
+  },
+  {
+    "name": "Ocean Guardian",
+    "filename": "ocean-guardian.png",
+    "category": "Nature",
+    "description": "Tsunami summoner \u2014 drowns all"
+  },
+  {
+    "name": "Lava Elemental",
+    "filename": "lava-elemental.png",
+    "category": "Nature",
+    "description": "Living magma \u2014 melts everything it touches"
+  },
+  {
+    "name": "Wind Walker",
+    "filename": "wind-walker.png",
+    "category": "Nature",
+    "description": "Tornado incarnate \u2014 uproots mountains"
+  },
+  {
+    "name": "Stone Giant",
+    "filename": "stone-giant.png",
+    "category": "Nature",
+    "description": "Mountain come alive \u2014 unstoppable force"
+  },
+  {
+    "name": "Mushroom Sage",
+    "filename": "mushroom-sage.png",
+    "category": "Nature",
+    "description": "Toxic spore master \u2014 hallucinogenic doom"
+  },
+  {
+    "name": "Crystal Golem",
+    "filename": "crystal-golem.png",
+    "category": "Nature",
+    "description": "Living crystal fortress \u2014 reflects attacks"
+  },
+  {
+    "name": "Bee Keeper",
+    "filename": "bee-keeper.png",
+    "category": "Nature",
+    "description": "Commands killer bee swarms \u2014 venomous stings"
+  },
+  {
+    "name": "Coral Dweller",
+    "filename": "coral-dweller.png",
+    "category": "Nature",
+    "description": "Deep sea creature \u2014 bioluminescent terror"
+  },
+  {
+    "name": "Frost Elemental",
+    "filename": "frost-elemental.png",
+    "category": "Nature",
+    "description": "Living blizzard \u2014 flash freezes on contact"
+  },
+  {
+    "name": "Clockwork Engineer",
+    "filename": "clockwork-engineer.png",
+    "category": "Steampunk",
+    "description": "Builds killer automatons \u2014 gear lord"
+  },
+  {
+    "name": "Airship Captain",
+    "filename": "airship-captain.png",
+    "category": "Steampunk",
+    "description": "Sky pirate lord \u2014 bombards from above"
+  },
+  {
+    "name": "Brass Automaton",
+    "filename": "brass-automaton.png",
+    "category": "Steampunk",
+    "description": "Steam-powered war machine \u2014 unstoppable"
+  },
+  {
+    "name": "Steam Witch",
+    "filename": "steam-witch.png",
+    "category": "Steampunk",
+    "description": "Potion bombs and steam curses"
+  },
+  {
+    "name": "Gear Knight",
+    "filename": "gear-knight.png",
+    "category": "Steampunk",
+    "description": "Clockwork armor \u2014 gears of destruction"
+  },
+  {
+    "name": "Tesla Gunner",
+    "filename": "tesla-gunner.png",
+    "category": "Steampunk",
+    "description": "Lightning cannon \u2014 fries everything"
+  },
+  {
+    "name": "Pipe Mechanic",
+    "filename": "pipe-mechanic.png",
+    "category": "Steampunk",
+    "description": "Steam pressure weapons \u2014 explosive"
+  },
+  {
+    "name": "Chronos",
+    "filename": "chronos.png",
+    "category": "Steampunk",
+    "description": "Time lord \u2014 freezes and reverses time"
+  },
+  {
+    "name": "Iron Maiden",
+    "filename": "iron-maiden.png",
+    "category": "Steampunk",
+    "description": "Armored steam queen \u2014 crushes all"
+  },
+  {
+    "name": "Boiler Beast",
+    "filename": "boiler-beast.png",
+    "category": "Steampunk",
+    "description": "Living steam engine \u2014 overheats and explodes"
+  },
+  {
+    "name": "Blacksmith",
+    "filename": "blacksmith.png",
+    "category": "Villagers",
+    "description": "Forges cursed weapons in hellfire"
+  },
+  {
+    "name": "Farmer",
+    "filename": "farmer.png",
+    "category": "Villagers",
+    "description": "Grows cursed crops \u2014 poisons everything"
+  },
+  {
+    "name": "Librarian",
+    "filename": "librarian.png",
+    "category": "Villagers",
+    "description": "Reads forbidden spell books \u2014 knows dark magic"
+  },
+  {
+    "name": "Cleric",
+    "filename": "cleric.png",
+    "category": "Villagers",
+    "description": "Holy fire priest \u2014 burns the unholy"
+  },
+  {
+    "name": "Butcher",
+    "filename": "butcher.png",
+    "category": "Villagers",
+    "description": "Cleaves monsters \u2014 blood-soaked warrior"
+  },
+  {
+    "name": "Fisher",
+    "filename": "fisher.png",
+    "category": "Villagers",
+    "description": "Fishes in lava lakes \u2014 catches fire fish"
+  },
+  {
+    "name": "Mason",
+    "filename": "mason.png",
+    "category": "Villagers",
+    "description": "Builds obsidian fortresses \u2014 unbreakable walls"
+  },
+  {
+    "name": "Cartographer",
+    "filename": "cartographer.png",
+    "category": "Villagers",
+    "description": "Maps cursed dimensions \u2014 knows all secrets"
+  },
+  {
+    "name": "Shepherd",
+    "filename": "shepherd.png",
+    "category": "Villagers",
+    "description": "Commands wolf packs \u2014 hunts at night"
+  },
+  {
+    "name": "Alchemist",
+    "filename": "alchemist.png",
+    "category": "Villagers",
+    "description": "Explosive potions \u2014 chemical warfare"
+  },
+  {
+    "name": "Shadow Ninja",
+    "filename": "shadow-ninja.png",
+    "category": "Ninjas",
+    "description": "Pure shadow \u2014 invisible death"
+  },
+  {
+    "name": "Fire Ninja",
+    "filename": "fire-ninja.png",
+    "category": "Ninjas",
+    "description": "FIRE EVERYWHERE \u2014 explosive jutsu master"
+  },
+  {
+    "name": "Ice Ninja",
+    "filename": "ice-ninja.png",
+    "category": "Ninjas",
+    "description": "Frozen blade \u2014 shatters enemies to pieces"
+  },
+  {
+    "name": "Poison Ninja",
+    "filename": "poison-ninja.png",
+    "category": "Ninjas",
+    "description": "Toxic blade \u2014 one cut = instant death"
+  },
+  {
+    "name": "Thunder Ninja",
+    "filename": "thunder-ninja.png",
+    "category": "Ninjas",
+    "description": "Lightning speed \u2014 strikes before you blink"
+  },
+  {
+    "name": "Wind Ninja",
+    "filename": "wind-ninja.png",
+    "category": "Ninjas",
+    "description": "Tornado attack \u2014 destroys whole villages"
+  },
+  {
+    "name": "Blood Ninja",
+    "filename": "blood-ninja.png",
+    "category": "Ninjas",
+    "description": "Crimson assassin \u2014 leaves no survivors"
+  },
+  {
+    "name": "Sand Ninja",
+    "filename": "sand-ninja.png",
+    "category": "Ninjas",
+    "description": "Desert storm warrior \u2014 buries enemies alive"
+  },
+  {
+    "name": "Void Ninja",
+    "filename": "void-ninja.png",
+    "category": "Ninjas",
+    "description": "Phases through walls \u2014 dimension cutter"
+  },
+  {
+    "name": "Master Ninja",
+    "filename": "master-ninja.png",
+    "category": "Ninjas",
+    "description": "Grandmaster of ALL ninja arts \u2014 final boss"
+  },
+  {
+    "name": "Dragon Rider",
+    "filename": "dragon-rider.png",
+    "category": "Fantasy",
+    "description": "Rides FIRE DRAGON \u2014 breathes flames"
+  },
+  {
+    "name": "Fairy",
+    "filename": "fairy.png",
+    "category": "Fantasy",
+    "description": "Dark fairy \u2014 curses everything it touches"
+  },
+  {
+    "name": "Dwarf Warrior",
+    "filename": "dwarf-warrior.png",
+    "category": "Fantasy",
+    "description": "Fire axe dwarf \u2014 forged in volcano"
+  },
+  {
+    "name": "Dark Elf",
+    "filename": "dark-elf.png",
+    "category": "Fantasy",
+    "description": "Shadow elf \u2014 poisons from the darkness"
+  },
+  {
+    "name": "Centaur Archer",
+    "filename": "centaur-archer.png",
+    "category": "Fantasy",
+    "description": "Fire arrows \u2014 never misses a shot"
+  },
+  {
+    "name": "Phoenix Mage",
+    "filename": "phoenix-mage.png",
+    "category": "Fantasy",
+    "description": "REBORN FROM FIRE \u2014 can never die"
+  },
+  {
+    "name": "Mermaid",
+    "filename": "mermaid.png",
+    "category": "Fantasy",
+    "description": "Deep sea siren \u2014 drowns sailors"
+  },
+  {
+    "name": "Griffon Knight",
+    "filename": "griffon-knight.png",
+    "category": "Fantasy",
+    "description": "Rides fire griffon into battle"
+  },
+  {
+    "name": "Vampire Lord",
+    "filename": "vampire-lord.png",
+    "category": "Fantasy",
+    "description": "Immortal blood lord \u2014 fear incarnate"
+  },
+  {
+    "name": "Werewolf",
+    "filename": "werewolf.png",
+    "category": "Fantasy",
+    "description": "Full moon BEAST \u2014 shreds everything"
+  },
+  {
+    "name": "Street Racer",
+    "filename": "street-racer.png",
+    "category": "Modern",
+    "description": "Nitro-fueled speed demon \u2014 car on fire"
+  },
+  {
+    "name": "DJ",
+    "filename": "dj.png",
+    "category": "Modern",
+    "description": "Bass drops so hard the floor cracks"
+  },
+  {
+    "name": "Skateboarder",
+    "filename": "skateboarder.png",
+    "category": "Modern",
+    "description": "Grinds on lava rails \u2014 no fear"
+  },
+  {
+    "name": "Scientist",
+    "filename": "scientist.png",
+    "category": "Modern",
+    "description": "Mad scientist \u2014 experiments with lava"
+  },
+  {
+    "name": "Chef",
+    "filename": "chef.png",
+    "category": "Modern",
+    "description": "Cooks with ACTUAL FIRE \u2014 flame master"
+  },
+  {
+    "name": "Firefighter",
+    "filename": "firefighter.png",
+    "category": "Modern",
+    "description": "Walks INTO fire \u2014 immune to flames"
+  },
+  {
+    "name": "Doctor",
+    "filename": "doctor.png",
+    "category": "Modern",
+    "description": "Combat medic with plasma healing tech"
+  },
+  {
+    "name": "Athlete",
+    "filename": "athlete.png",
+    "category": "Modern",
+    "description": "Runs so fast trails catch fire"
+  },
+  {
+    "name": "Photographer",
+    "filename": "photographer.png",
+    "category": "Modern",
+    "description": "Captures explosions \u2014 war photographer"
+  },
+  {
+    "name": "Musician",
+    "filename": "musician.png",
+    "category": "Modern",
+    "description": "Heavy metal \u2014 guitar shoots flames"
+  },
+  {
+    "name": "Santa Claus",
+    "filename": "santa-claus.png",
+    "category": "Holidays",
+    "description": "EVIL Santa \u2014 delivers fire and chaos"
+  },
+  {
+    "name": "Elf Helper",
+    "filename": "elf-helper.png",
+    "category": "Holidays",
+    "description": "Builds explosive toys \u2014 demolition elf"
+  },
+  {
+    "name": "Pumpkin King",
+    "filename": "pumpkin-king.png",
+    "category": "Holidays",
+    "description": "Flaming pumpkin head \u2014 terror of Halloween"
+  },
+  {
+    "name": "Ghost",
+    "filename": "ghost.png",
+    "category": "Holidays",
+    "description": "Vengeful spirit \u2014 haunts your nightmares"
+  },
+  {
+    "name": "Easter Bunny",
+    "filename": "easter-bunny.png",
+    "category": "Holidays",
+    "description": "Lays explosive fire eggs \u2014 run away"
+  },
+  {
+    "name": "Cupid",
+    "filename": "cupid.png",
+    "category": "Holidays",
+    "description": "Shoots FIRE arrows \u2014 love burns"
+  },
+  {
+    "name": "Snowman",
+    "filename": "snowman.png",
+    "category": "Holidays",
+    "description": "Fire core snowman \u2014 melts then reforms"
+  },
+  {
+    "name": "Witch",
+    "filename": "witch.png",
+    "category": "Holidays",
+    "description": "Fire witch \u2014 brews lava potions"
+  },
+  {
+    "name": "Fireworks Master",
+    "filename": "fireworks-master.png",
+    "category": "Holidays",
+    "description": "MAXIMUM EXPLOSIONS \u2014 pyro king"
+  },
+  {
+    "name": "Leprechaun",
+    "filename": "leprechaun.png",
+    "category": "Holidays",
+    "description": "Evil leprechaun \u2014 gold is cursed fire"
+  },
+  {
+    "name": "Captain Blackbeard",
+    "filename": "captain-blackbeard.png",
+    "category": "Pirates",
+    "description": "Beard literally on fire \u2014 feared everywhere"
+  },
+  {
+    "name": "First Mate",
+    "filename": "first-mate.png",
+    "category": "Pirates",
+    "description": "One-eyed demon sailor \u2014 no mercy"
+  },
+  {
+    "name": "Corsair",
+    "filename": "corsair.png",
+    "category": "Pirates",
+    "description": "Ghost ship raider \u2014 cursed gold collector"
+  },
+  {
+    "name": "Deck Hand",
+    "filename": "deck-hand.png",
+    "category": "Pirates",
+    "description": "Sails through lava seas \u2014 fireproof"
+  },
+  {
+    "name": "Pirate Queen",
+    "filename": "pirate-queen.png",
+    "category": "Pirates",
+    "description": "Rules fire seas \u2014 burns enemy ships"
+  },
+  {
+    "name": "Buccaneer",
+    "filename": "buccaneer.png",
+    "category": "Pirates",
+    "description": "Rough demon pirate \u2014 takes no prisoners"
+  },
+  {
+    "name": "Navigator",
+    "filename": "navigator.png",
+    "category": "Pirates",
+    "description": "Charts paths through lava oceans"
+  },
+  {
+    "name": "Cannon Master",
+    "filename": "cannon-master.png",
+    "category": "Pirates",
+    "description": "Fire cannons \u2014 explosions expert"
+  },
+  {
+    "name": "Swashbuckler",
+    "filename": "swashbuckler.png",
+    "category": "Pirates",
+    "description": "Flaming dual swords \u2014 unstoppable fighter"
+  },
+  {
+    "name": "Ghost Pirate",
+    "filename": "ghost-pirate.png",
+    "category": "Pirates",
+    "description": "Cursed spectral pirate \u2014 phasing ghost ship"
+  },
+  {
+    "name": "Shonen Hero",
+    "filename": "shonen-hero.png",
+    "category": "Anime",
+    "description": "Power level OVER 9000 \u2014 fire fists"
+  },
+  {
+    "name": "Magical Girl",
+    "filename": "magical-girl.png",
+    "category": "Anime",
+    "description": "Dark magical girl \u2014 destruction transformation"
+  },
+  {
+    "name": "Mecha Pilot",
+    "filename": "mecha-pilot.png",
+    "category": "Anime",
+    "description": "Giant fire mech \u2014 levels whole cities"
+  },
+  {
+    "name": "Demon Slayer",
+    "filename": "demon-slayer.png",
+    "category": "Anime",
+    "description": "ULTIMATE demon killer \u2014 flaming blade"
+  },
+  {
+    "name": "Spirit Medium",
+    "filename": "spirit-medium.png",
+    "category": "Anime",
+    "description": "Channels fire spirits from beyond"
+  },
+  {
+    "name": "Ninja Student",
+    "filename": "ninja-student.png",
+    "category": "Anime",
+    "description": "Training with FIRE jutsu \u2014 watch out"
+  },
+  {
+    "name": "Pirate Captain Anime",
+    "filename": "pirate-captain-anime.png",
+    "category": "Anime",
+    "description": "Devil fruit fire power \u2014 unbeatable"
+  },
+  {
+    "name": "School Rival",
+    "filename": "school-rival.png",
+    "category": "Anime",
+    "description": "Cool loner \u2014 hidden dark power within"
+  },
+  {
+    "name": "Fox Spirit",
+    "filename": "fox-spirit.png",
+    "category": "Anime",
+    "description": "Nine-tailed FIRE fox \u2014 burns villages"
+  },
+  {
+    "name": "Cyber Idol",
+    "filename": "cyber-idol.png",
+    "category": "Anime",
+    "description": "Neon cyber pop star \u2014 hacks with music"
+  },
+  {
+    "name": "Zeus",
+    "filename": "zeus.png",
+    "category": "Mythological",
+    "description": "LIGHTNING GOD \u2014 obliterates with bolts"
+  },
+  {
+    "name": "Valkyrie",
+    "filename": "valkyrie.png",
+    "category": "Mythological",
+    "description": "Death chooser \u2014 flaming war maiden"
+  },
+  {
+    "name": "Anubis",
+    "filename": "anubis.png",
+    "category": "Mythological",
+    "description": "Death god \u2014 judges souls with fire scales"
+  },
+  {
+    "name": "Minotaur",
+    "filename": "minotaur.png",
+    "category": "Mythological",
+    "description": "Labyrinth beast \u2014 charges through walls"
+  },
+  {
+    "name": "Thor",
+    "filename": "thor.png",
+    "category": "Mythological",
+    "description": "THUNDER GOD \u2014 hammer of destruction"
+  },
+  {
+    "name": "Medusa",
+    "filename": "medusa.png",
+    "category": "Mythological",
+    "description": "Gaze turns enemies to LAVA stone"
+  },
+  {
+    "name": "Odin",
+    "filename": "odin.png",
+    "category": "Mythological",
+    "description": "All-Father \u2014 one eye sees EVERYTHING"
+  },
+  {
+    "name": "Kitsune",
+    "filename": "kitsune.png",
+    "category": "Mythological",
+    "description": "Fire fox trickster \u2014 nine blazing tails"
+  },
+  {
+    "name": "Poseidon",
+    "filename": "poseidon.png",
+    "category": "Mythological",
+    "description": "Sea god \u2014 creates tsunamis and whirlpools"
+  },
+  {
+    "name": "Sphinx",
+    "filename": "sphinx.png",
+    "category": "Mythological",
+    "description": "Riddle wrong = FIRE DEATH"
+  }
+]

@@ -15,79 +15,24 @@
     <!-- ===== SKINS PANEL (LEFT) ===== -->
     <div class="panel panel-skins" id="panel-skins">
       <div class="panel-header">
-        <h2 class="panel-title skin-title">Skins</h2>
+        <h2 class="panel-title skin-title">Skin Vault</h2>
       </div>
-      <div class="panel-body">
-        <div class="panel-tools">
-          <div class="tool-buttons">
-            <button class="tool-btn active" data-tool="pencil" data-panel="skin" title="Pencil">
-              <span class="tool-icon">&#9998;</span><span class="tool-label">Draw</span>
-            </button>
-            <button class="tool-btn" data-tool="eraser" data-panel="skin" title="Eraser">
-              <span class="tool-icon">&#9746;</span><span class="tool-label">Erase</span>
-            </button>
-            <button class="tool-btn" data-tool="fill" data-panel="skin" title="Fill">
-              <span class="tool-icon">&#9832;</span><span class="tool-label">Fill</span>
-            </button>
-            <button class="tool-btn" data-tool="picker" data-panel="skin" title="Pick Color">
-              <span class="tool-icon">&#128270;</span><span class="tool-label">Pick</span>
-            </button>
-          </div>
-          <div class="color-section-mini">
-            <div class="current-color-display">
-              <div id="skin-current-color" class="current-color-box" style="background-color: #c68e56;"></div>
-              <span id="skin-color-label">#C68E56</span>
-            </div>
-            <div id="skin-color-palette" class="color-palette"></div>
-            <input type="color" id="skin-custom-color" value="#c68e56" title="Pick any color">
-          </div>
-        </div>
-
-        <div class="panel-editor">
-          <div class="canvas-wrapper skin-canvas-wrapper" data-tool="pencil">
-            <canvas id="skin-pixel-canvas" width="512" height="512"></canvas>
-            <canvas id="skin-grid-canvas" width="512" height="512"></canvas>
-          </div>
-          <div class="editor-controls">
-            <button class="control-btn" id="skin-undo">Undo</button>
-            <button class="control-btn" id="skin-redo">Redo</button>
-            <button class="control-btn" id="skin-flip-h">Flip &harr;</button>
-            <button class="control-btn control-btn-danger" id="skin-clear">Clear</button>
-            <label class="grid-toggle">
-              <input type="checkbox" id="skin-show-grid" checked> Grid
-            </label>
-            <label class="grid-toggle">
-              <input type="checkbox" id="skin-mirror"> Mirror
-            </label>
-          </div>
-        </div>
-
-        <div class="panel-sidebar">
-          <div class="preview-section">
-            <h3>Preview</h3>
-            <canvas id="skin-preview-canvas" width="160" height="220"></canvas>
-          </div>
-          <div class="skin-templates">
-            <h3>Start From</h3>
-            <div class="skin-template-buttons">
-              <button class="skin-template-btn" data-skin="steve">Steve</button>
-              <button class="skin-template-btn" data-skin="alex">Alex</button>
-              <button class="skin-template-btn" data-skin="blank">Blank</button>
-            </div>
-          </div>
-          <div class="skin-download-section">
-            <input type="text" id="skin-name" placeholder="My Skin" maxlength="32">
-            <button id="btn-download-skin" class="action-btn download-btn">Download Skin!</button>
-          </div>
-          <div class="skin-help">
-            <h3>How to Use Your Skin</h3>
-            <p>1. Download your skin PNG</p>
-            <p>2. Go to <strong>minecraft.net</strong> and log in</p>
-            <p>3. Click your profile, then "Change Skin"</p>
-            <p>4. Upload the PNG file</p>
-            <p>5. Your new skin shows up in-game!</p>
-          </div>
-        </div>
+      <div class="skin-controls">
+        <input type="text" id="skin-search" placeholder="Search skins...">
+        <select id="skin-category">
+          <option value="all">All Categories</option>
+        </select>
+      </div>
+      <div class="skin-stats">
+        Showing <span id="skin-count">0</span> of <span id="skin-total">0</span> skins
+      </div>
+      <div class="skin-grid" id="skin-grid"></div>
+      <div class="skin-help-bottom">
+        <h3>How to Use a Skin</h3>
+        <p>1. Download a skin PNG</p>
+        <p>2. Go to <strong>minecraft.net</strong> and log in</p>
+        <p>3. Click your profile, then "Change Skin"</p>
+        <p>4. Upload the PNG file</p>
       </div>
     </div>
 

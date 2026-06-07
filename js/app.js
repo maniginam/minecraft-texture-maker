@@ -1,5 +1,4 @@
 import { PixelEditor } from './pixel-editor.js';
-import { SkinEditor, generateSteveSkin, generateAlexSkin } from './skin-editor.js';
 import { createPalette } from './color-palette.js';
 import { TEMPLATES, TEXTURE_TARGETS, templateToImageData, templateToScaledImageData } from './templates.js';
 import { PackExporter } from './pack-exporter.js';
@@ -12,25 +11,13 @@ const gridCanvas = document.getElementById('grid-canvas');
 const editor = new PixelEditor(pixelCanvas, gridCanvas, { displaySize: 512, gridSize: 16 });
 const exporter = new PackExporter();
 
-// ===== SKIN EDITOR (LEFT PANEL) =====
-const skinPixelCanvas = document.getElementById('skin-pixel-canvas');
-const skinGridCanvas = document.getElementById('skin-grid-canvas');
-const skinPreviewCanvas = document.getElementById('skin-preview-canvas');
-const skinEditor = new SkinEditor(skinPixelCanvas, skinGridCanvas, skinPreviewCanvas);
-const skinInner = skinEditor.getEditor();
-
-// Track which panel was last active (for keyboard shortcuts)
-let activePanel = 'texture';
-document.getElementById('panel-skins').addEventListener('mousedown', () => { activePanel = 'skin'; });
-document.getElementById('panel-textures').addEventListener('mousedown', () => { activePanel = 'texture'; });
-
 // ===== TEXTURE COLOR PALETTE =====
 const paletteContainer = document.getElementById('color-palette');
 const currentColorEl = document.getElementById('current-color');
 const currentColorLabel = document.getElementById('current-color-label');
 const customColorInput = document.getElementById('custom-color');
 
-function setTextureColor(color) {
+function setColor(color) {
   editor.setColor(color);
   currentColorEl.style.backgroundColor = color;
   currentColorLabel.textContent = color.toUpperCase();
@@ -38,71 +25,35 @@ function setTextureColor(color) {
 }
 
 createPalette(paletteContainer, (color) => {
-  setTextureColor(color);
+  setColor(color);
   playClick();
 });
 
 customColorInput.addEventListener('input', (e) => {
-  setTextureColor(e.target.value);
+  setColor(e.target.value);
   paletteContainer.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
 });
 
 editor.onColorPicked = (color) => {
-  setTextureColor(color);
+  setColor(color);
   showToast('Color picked!', 'info');
 };
 
-// ===== SKIN COLOR PALETTE =====
-const skinPaletteContainer = document.getElementById('skin-color-palette');
-const skinCurrentColorEl = document.getElementById('skin-current-color');
-const skinColorLabel = document.getElementById('skin-color-label');
-const skinCustomColorInput = document.getElementById('skin-custom-color');
-
-function setSkinColor(color) {
-  skinInner.setColor(color);
-  skinCurrentColorEl.style.backgroundColor = color;
-  skinColorLabel.textContent = color.toUpperCase();
-  skinCustomColorInput.value = color;
-}
-
-createPalette(skinPaletteContainer, (color) => {
-  setSkinColor(color);
-  playClick();
-});
-
-skinCustomColorInput.addEventListener('input', (e) => {
-  setSkinColor(e.target.value);
-  skinPaletteContainer.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
-});
-
-skinInner.onColorPicked = (color) => {
-  setSkinColor(color);
-  showToast('Color picked!', 'info');
-};
-
-// ===== TOOLS (scoped per panel) =====
-const textureCanvasWrapper = document.querySelector('.panel-textures .canvas-wrapper');
-const skinCanvasWrapper = document.querySelector('.panel-skins .skin-canvas-wrapper');
+// ===== TOOLS =====
+const canvasWrapperEl = document.querySelector('.canvas-wrapper');
+canvasWrapperEl.dataset.tool = 'pencil';
 
 document.querySelectorAll('.tool-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    const panel = btn.dataset.panel;
-    // Deactivate sibling tools in same panel
-    document.querySelectorAll(`.tool-btn[data-panel="${panel}"]`).forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-
-    if (panel === 'texture') {
-      editor.setTool(btn.dataset.tool);
-      textureCanvasWrapper.dataset.tool = btn.dataset.tool;
-    } else {
-      skinInner.setTool(btn.dataset.tool);
-      skinCanvasWrapper.dataset.tool = btn.dataset.tool;
-    }
+    editor.setTool(btn.dataset.tool);
+    canvasWrapperEl.dataset.tool = btn.dataset.tool;
     playClick();
   });
 });
 
-// ===== TEXTURE CANVAS SIZE =====
+// ===== CANVAS SIZE =====
 document.querySelectorAll('.size-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
@@ -112,68 +63,50 @@ document.querySelectorAll('.size-btn').forEach(btn => {
   });
 });
 
-// ===== TEXTURE CONTROLS =====
+// ===== CONTROLS =====
 document.getElementById('btn-undo').addEventListener('click', () => { editor.undo(); playUndo(); });
 document.getElementById('btn-redo').addEventListener('click', () => { editor.redo(); playUndo(); });
+
 document.getElementById('btn-clear').addEventListener('click', () => {
   if (!confirm('Clear your whole drawing?')) return;
   editor.clear();
   playClear();
   showToast('Canvas cleared!', 'warning');
 });
+
 document.getElementById('btn-flip-h').addEventListener('click', () => {
   editor.flipHorizontal(); playClick(); showToast('Flipped!', 'info');
 });
 document.getElementById('btn-flip-v').addEventListener('click', () => {
   editor.flipVertical(); playClick(); showToast('Flipped!', 'info');
 });
-document.getElementById('show-grid').addEventListener('change', (e) => { editor.setGridVisible(e.target.checked); });
+
+document.getElementById('show-grid').addEventListener('change', (e) => {
+  editor.setGridVisible(e.target.checked);
+});
+
 document.getElementById('mirror-mode').addEventListener('change', (e) => {
   editor.setMirrorMode(e.target.checked);
   if (e.target.checked) showToast('Mirror mode ON!', 'info');
 });
 
-// ===== SKIN CONTROLS =====
-document.getElementById('skin-undo').addEventListener('click', () => { skinInner.undo(); playUndo(); });
-document.getElementById('skin-redo').addEventListener('click', () => { skinInner.redo(); playUndo(); });
-document.getElementById('skin-clear').addEventListener('click', () => {
-  if (!confirm('Clear your whole skin?')) return;
-  skinInner.clear();
-  skinEditor.refreshOverlay();
-  playClear();
-  showToast('Skin cleared!', 'warning');
-});
-document.getElementById('skin-flip-h').addEventListener('click', () => {
-  skinInner.flipHorizontal(); playClick(); showToast('Flipped!', 'info');
-});
-document.getElementById('skin-show-grid').addEventListener('change', (e) => {
-  skinInner.setGridVisible(e.target.checked);
-  skinEditor.refreshOverlay();
-});
-document.getElementById('skin-mirror').addEventListener('change', (e) => {
-  skinInner.setMirrorMode(e.target.checked);
-  if (e.target.checked) showToast('Mirror mode ON!', 'info');
-});
-
-// ===== KEYBOARD SHORTCUTS =====
+// Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
   if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
     e.preventDefault();
-    const ed = activePanel === 'skin' ? skinInner : editor;
-    if (e.shiftKey) { ed.redo(); } else { ed.undo(); }
+    if (e.shiftKey) { editor.redo(); } else { editor.undo(); }
     playUndo();
   }
 });
 
-// ===== TEXTURE PREVIEW (Isometric 3D Block) =====
+// ===== PREVIEW (Isometric 3D Block) =====
 const previewCanvas = document.getElementById('preview-canvas');
 const previewCtx = previewCanvas.getContext('2d');
 
 function drawIsometricBlock(ctx, texture, cx, cy, size) {
   const h = size * 0.5;
 
-  // Top face
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(cx, cy - h);
@@ -187,7 +120,6 @@ function drawIsometricBlock(ctx, texture, cx, cy, size) {
   ctx.drawImage(texture, 0, 0, size, size);
   ctx.restore();
 
-  // Left face
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(cx - size, cy);
@@ -209,7 +141,6 @@ function drawIsometricBlock(ctx, texture, cx, cy, size) {
   ctx.closePath();
   ctx.fill();
 
-  // Right face
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(cx + size, cy);
@@ -232,7 +163,7 @@ function drawIsometricBlock(ctx, texture, cx, cy, size) {
   ctx.fill();
 }
 
-function updateTexturePreview() {
+function updatePreview() {
   const textureCanvas = editor.getTextureData();
   previewCtx.imageSmoothingEnabled = false;
   previewCtx.clearRect(0, 0, 192, 192);
@@ -240,9 +171,9 @@ function updateTexturePreview() {
   debouncedAutoSave();
 }
 
-editor.onPreviewUpdate = updateTexturePreview;
+editor.onPreviewUpdate = updatePreview;
 
-// ===== TEXTURE TEMPLATES =====
+// ===== TEMPLATES =====
 const templateList = document.getElementById('template-list');
 
 Object.entries(TEMPLATES).forEach(([key, template]) => {
@@ -274,67 +205,6 @@ Object.entries(TEMPLATES).forEach(([key, template]) => {
   });
 
   templateList.appendChild(item);
-});
-
-// ===== SKIN TEMPLATES =====
-function loadSkinTemplate(pixels) {
-  const size = 64;
-  const imgData = new ImageData(size, size);
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const color = pixels[y] && pixels[y][x];
-      if (!color) continue;
-      const i = (y * size + x) * 4;
-      const r = parseInt(color.slice(1, 3), 16);
-      const g = parseInt(color.slice(3, 5), 16);
-      const b = parseInt(color.slice(5, 7), 16);
-      imgData.data[i] = r;
-      imgData.data[i + 1] = g;
-      imgData.data[i + 2] = b;
-      imgData.data[i + 3] = 255;
-    }
-  }
-  // Scale to display size
-  const tempCanvas = document.createElement('canvas');
-  tempCanvas.width = size;
-  tempCanvas.height = size;
-  tempCanvas.getContext('2d').putImageData(imgData, 0, 0);
-
-  const scaled = document.createElement('canvas');
-  scaled.width = 512;
-  scaled.height = 512;
-  const sCtx = scaled.getContext('2d');
-  sCtx.imageSmoothingEnabled = false;
-  sCtx.drawImage(tempCanvas, 0, 0, 512, 512);
-
-  skinInner.loadImageData(sCtx.getImageData(0, 0, 512, 512));
-  skinEditor.refreshOverlay();
-  playPlace();
-}
-
-document.querySelectorAll('.skin-template-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const skin = btn.dataset.skin;
-    if (skin === 'steve') {
-      loadSkinTemplate(generateSteveSkin());
-      showToast('Loaded Steve!', 'info');
-    } else if (skin === 'alex') {
-      loadSkinTemplate(generateAlexSkin());
-      showToast('Loaded Alex!', 'info');
-    } else {
-      skinInner.clear();
-      skinEditor.refreshOverlay();
-      showToast('Blank skin!', 'info');
-    }
-  });
-});
-
-// ===== SKIN DOWNLOAD =====
-document.getElementById('btn-download-skin').addEventListener('click', () => {
-  const name = document.getElementById('skin-name').value.trim() || 'my-skin';
-  skinEditor.downloadSkin(name);
-  playSuccess();
-  showToast('Skin downloaded!', 'success');
 });
 
 // ===== TEXTURE TARGET SELECT (grouped) =====
@@ -500,13 +370,10 @@ function debouncedAutoSave() {
 function autoSave() {
   try {
     const dataURL = pixelCanvas.toDataURL('image/png');
-    const skinDataURL = skinPixelCanvas.toDataURL('image/png');
     const saved = {
       drawing: dataURL,
       gridSize: editor.gridSize,
       packName: document.getElementById('pack-name').value,
-      skinDrawing: skinDataURL,
-      skinName: document.getElementById('skin-name').value,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
   } catch (e) {
@@ -542,30 +409,17 @@ function loadFromStorage() {
       if (saved.packName) {
         document.getElementById('pack-name').value = saved.packName;
       }
-      if (saved.skinName) {
-        document.getElementById('skin-name').value = saved.skinName;
-      }
       if (saved.drawing) {
         const img = new Image();
         img.onload = () => {
           editor.ctx.clearRect(0, 0, editor.displaySize, editor.displaySize);
           editor.ctx.drawImage(img, 0, 0);
-          updateTexturePreview();
+          updatePreview();
         };
         img.src = saved.drawing;
       }
-      if (saved.skinDrawing) {
-        const img = new Image();
-        img.onload = () => {
-          skinInner.ctx.clearRect(0, 0, skinInner.displaySize, skinInner.displaySize);
-          skinInner.ctx.drawImage(img, 0, 0);
-          skinEditor.updatePreview();
-        };
-        img.src = saved.skinDrawing;
-      }
     }
 
-    // Restore pack textures
     const packData = JSON.parse(localStorage.getItem(STORAGE_KEY + '-pack'));
     if (packData && packData.length > 0) {
       let loaded = 0;
@@ -588,15 +442,7 @@ function loadFromStorage() {
   }
 }
 
-// Save on name changes
 document.getElementById('pack-name').addEventListener('input', autoSave);
-document.getElementById('skin-name').addEventListener('input', autoSave);
-
-// Also save skin on every skin edit
-skinInner.onPreviewUpdate = () => {
-  skinEditor.updatePreview();
-  debouncedAutoSave();
-};
 
 // ===== BACKGROUND REMOVAL =====
 function removeBackground(imageData, width, height) {
@@ -814,7 +660,7 @@ function loadSingleObjectToEditor(objCanvas) {
   editor.loadImageData(templateToScaledImageData({ pixels }, editor.displaySize));
 }
 
-// ===== DRAG & DROP (texture panel only) =====
+// ===== DRAG & DROP =====
 function loadImageToEditor(img) {
   const detectSize = 256;
   const detectCanvas = document.createElement('canvas');
@@ -851,18 +697,20 @@ function loadImageToEditor(img) {
   }
 }
 
-textureCanvasWrapper.addEventListener('dragover', (e) => {
+const canvasWrapper = document.querySelector('.canvas-wrapper');
+
+canvasWrapper.addEventListener('dragover', (e) => {
   e.preventDefault();
-  textureCanvasWrapper.style.outline = '3px dashed #4caf50';
+  canvasWrapper.style.outline = '3px dashed #4caf50';
 });
 
-textureCanvasWrapper.addEventListener('dragleave', () => {
-  textureCanvasWrapper.style.outline = '';
+canvasWrapper.addEventListener('dragleave', () => {
+  canvasWrapper.style.outline = '';
 });
 
-textureCanvasWrapper.addEventListener('drop', (e) => {
+canvasWrapper.addEventListener('drop', (e) => {
   e.preventDefault();
-  textureCanvasWrapper.style.outline = '';
+  canvasWrapper.style.outline = '';
   const file = e.dataTransfer.files[0];
   if (file && file.type.startsWith('image/')) {
     const img = new Image();
@@ -874,7 +722,6 @@ textureCanvasWrapper.addEventListener('drop', (e) => {
   }
 });
 
-// Paste goes to texture editor
 document.addEventListener('paste', (e) => {
   const items = e.clipboardData.items;
   for (const item of items) {
@@ -910,9 +757,7 @@ divider.addEventListener('mousedown', (e) => {
 document.addEventListener('mousemove', (e) => {
   if (!isDragging) return;
   const containerRect = splitContainer.getBoundingClientRect();
-  const x = e.clientX - containerRect.left;
-  const total = containerRect.width - 8; // minus divider width
-  const pct = Math.max(20, Math.min(80, (x / containerRect.width) * 100));
+  const pct = Math.max(15, Math.min(50, (e.clientX - containerRect.left) / containerRect.width * 100));
   skinPanel.style.flex = 'none';
   skinPanel.style.width = pct + '%';
   texturePanel.style.flex = 'none';
@@ -927,7 +772,92 @@ document.addEventListener('mouseup', () => {
   }
 });
 
+// ===== SKIN GALLERY (LEFT PANEL) =====
+let allSkins = [];
+const skinGrid = document.getElementById('skin-grid');
+const skinSearch = document.getElementById('skin-search');
+const skinCategory = document.getElementById('skin-category');
+const skinCountEl = document.getElementById('skin-count');
+const skinTotalEl = document.getElementById('skin-total');
+
+async function loadSkinGallery() {
+  try {
+    const resp = await fetch('skins_metadata.json');
+    allSkins = await resp.json();
+    skinTotalEl.textContent = allSkins.length;
+
+    // Populate categories
+    const categories = [...new Set(allSkins.map(s => s.category))].sort();
+    categories.forEach(cat => {
+      const opt = document.createElement('option');
+      opt.value = cat;
+      opt.textContent = cat;
+      skinCategory.appendChild(opt);
+    });
+
+    renderSkins(allSkins);
+  } catch (e) {
+    skinGrid.innerHTML = '<div class="skin-no-results">Failed to load skins.</div>';
+  }
+}
+
+function renderSkins(skins) {
+  skinCountEl.textContent = skins.length;
+  if (skins.length === 0) {
+    skinGrid.innerHTML = '<div class="skin-no-results">No skins found.</div>';
+    return;
+  }
+
+  skinGrid.innerHTML = '';
+  skins.forEach(skin => {
+    const card = document.createElement('div');
+    card.className = 'skin-card';
+
+    card.innerHTML = `
+      <div class="skin-card-preview">
+        <img src="avatars/${skin.filename}" alt="${skin.name}" loading="lazy">
+      </div>
+      <div class="skin-card-info">
+        <h4 title="${skin.name}">${skin.name}</h4>
+        <span class="skin-card-category">${skin.category}</span>
+      </div>
+      <a href="skins/${skin.filename}" class="skin-card-download" download>Download</a>
+    `;
+
+    // Stop download link from triggering card click
+    card.querySelector('.skin-card-download').addEventListener('click', (e) => {
+      e.stopPropagation();
+      playSuccess();
+      showToast(`Downloading ${skin.name}!`, 'success');
+    });
+
+    skinGrid.appendChild(card);
+  });
+}
+
+function filterSkins() {
+  const search = skinSearch.value.toLowerCase();
+  const cat = skinCategory.value;
+  const filtered = allSkins.filter(s => {
+    const matchCat = cat === 'all' || s.category === cat;
+    const matchSearch = !search || s.name.toLowerCase().includes(search) ||
+      (s.description || '').toLowerCase().includes(search);
+    return matchCat && matchSearch;
+  });
+  renderSkins(filtered);
+}
+
+skinSearch.addEventListener('input', filterSkins);
+skinCategory.addEventListener('change', filterSkins);
+
 // ===== STARTUP =====
 loadFromStorage();
 renderPackTextures();
-updateTexturePreview();
+updatePreview();
+loadSkinGallery();
+
+// Set initial split: skins panel narrower (30%)
+skinPanel.style.flex = 'none';
+skinPanel.style.width = '30%';
+texturePanel.style.flex = 'none';
+texturePanel.style.width = '70%';
