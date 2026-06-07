@@ -1,3 +1,5 @@
+import { getFireSweepFrames } from './fire-sweep.js';
+
 export class PackExporter {
   constructor() {
     this.textures = [];
@@ -43,6 +45,13 @@ export class PackExporter {
       const pngData = await this._canvasToPngBlob(texture.canvas);
       const path = `assets/minecraft/textures/${texture.targetPath}.png`;
       zip.file(path, pngData);
+    }
+
+    // Always include fire sweep particles (replaces white sweep with fire)
+    const sweepFrames = getFireSweepFrames();
+    for (const frame of sweepFrames) {
+      const pngData = await this._canvasToPngBlob(frame.canvas);
+      zip.file(`assets/minecraft/textures/${frame.path}.png`, pngData);
     }
 
     // Generate and download
