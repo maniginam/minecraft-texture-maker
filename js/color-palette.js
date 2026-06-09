@@ -12,6 +12,8 @@ export const PALETTE_COLORS = [
   '#F44336', '#B71C1C', '#FF5722', '#FF9800', '#FFB74D', '#E65100',
   // Row 6: Purples & Special (ender, obsidian, diamond)
   '#9C27B0', '#4A148C', '#CE93D8', '#00BCD4', '#26C6DA', '#FFEB3B',
+  // Row 7: Metals & Gold
+  '#FFD700', '#DAA520', '#B8860B', '#C0C0C0', '#A8A8A8', '#8B8B8B',
 ];
 
 export function createPalette(container, onColorSelect) {

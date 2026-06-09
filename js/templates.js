@@ -204,6 +204,10 @@ export const TEXTURE_TARGETS = [
   { value: 'item/arrow', label: 'Arrow' },
   { value: 'item/trident', label: 'Trident' },
   // --- Armor ---
+  { value: 'item/iron_helmet', label: 'Iron Helmet' },
+  { value: 'item/iron_chestplate', label: 'Iron Chestplate' },
+  { value: 'item/iron_leggings', label: 'Iron Leggings' },
+  { value: 'item/iron_boots', label: 'Iron Boots' },
   { value: 'item/diamond_helmet', label: 'Diamond Helmet' },
   { value: 'item/diamond_chestplate', label: 'Diamond Chestplate' },
   { value: 'item/diamond_leggings', label: 'Diamond Leggings' },
