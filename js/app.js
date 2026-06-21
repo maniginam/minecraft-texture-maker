@@ -4,6 +4,8 @@ import { TEMPLATES, TEXTURE_TARGETS, templateToImageData, templateToScaledImageD
 import { PackExporter } from './pack-exporter.js';
 import { showToast } from './toast.js';
 import { playPlace, playSuccess, playUndo, playClear, playClick, playError } from './sounds.js';
+import { createSoundMaker } from './sound-maker.js';
+import { PRESETS } from './presets-audio.js';
 
 // ===== TEXTURE EDITOR (RIGHT PANEL) =====
 const pixelCanvas = document.getElementById('pixel-canvas');
@@ -850,9 +852,264 @@ function filterSkins() {
 skinSearch.addEventListener('input', filterSkins);
 skinCategory.addEventListener('change', filterSkins);
 
+// ===== SOUNDS =====
+const soundMaker = createSoundMaker();
+
+const SOUND_TRIGGERS = [
+  { group: 'Weapons (hit a mob)', options: [
+    { label: 'Sword swing', kind: 'item', trigger: 'attack', itemId: 'minecraft:diamond_sword' },
+    { label: 'Netherite sword', kind: 'item', trigger: 'attack', itemId: 'minecraft:netherite_sword' },
+    { label: 'Axe hit', kind: 'item', trigger: 'attack', itemId: 'minecraft:diamond_axe' },
+    { label: 'Mace smash', kind: 'item', trigger: 'attack', itemId: 'minecraft:mace' },
+    { label: 'Trident jab', kind: 'item', trigger: 'attack', itemId: 'minecraft:trident' },
+  ] },
+  { group: 'Eating & Drinking', options: [
+    { label: 'Eat golden apple', kind: 'item', trigger: 'consume', itemId: 'minecraft:golden_apple' },
+    { label: 'Eat cooked beef', kind: 'item', trigger: 'consume', itemId: 'minecraft:cooked_beef' },
+    { label: 'Drink potion', kind: 'item', trigger: 'consume', itemId: 'minecraft:potion' },
+    { label: 'Drink milk', kind: 'item', trigger: 'consume', itemId: 'minecraft:milk_bucket' },
+  ] },
+  { group: 'Replace a game sound (works everywhere)', options: [
+    { label: 'Level up', kind: 'vanilla', vanillaEvent: 'entity.player.levelup' },
+    { label: 'Get XP', kind: 'vanilla', vanillaEvent: 'entity.experience_orb.pickup' },
+    { label: 'Pick up item', kind: 'vanilla', vanillaEvent: 'entity.item.pickup' },
+    { label: 'Shoot bow', kind: 'vanilla', vanillaEvent: 'entity.arrow.shoot' },
+    { label: 'Shoot crossbow', kind: 'vanilla', vanillaEvent: 'item.crossbow.shoot' },
+    { label: 'Totem of Undying', kind: 'vanilla', vanillaEvent: 'item.totem.use' },
+    { label: 'Shield block', kind: 'vanilla', vanillaEvent: 'item.shield.block' },
+  ] },
+];
+
+const FLAT_TRIGGERS = SOUND_TRIGGERS.flatMap((g) => g.options);
+
+const triggerSelect = document.getElementById('sound-trigger-select');
+SOUND_TRIGGERS.forEach((group) => {
+  const og = document.createElement('optgroup');
+  og.label = group.group;
+  group.options.forEach((opt) => {
+    const flatIndex = FLAT_TRIGGERS.indexOf(opt);
+    const o = document.createElement('option');
+    o.value = String(flatIndex);
+    o.textContent = opt.label;
+    og.appendChild(o);
+  });
+  triggerSelect.appendChild(og);
+});
+
+const presetGrid = document.getElementById('preset-grid');
+PRESETS.forEach((p) => {
+  const btn = document.createElement('button');
+  btn.className = 'preset-btn';
+  btn.textContent = p.label;
+  btn.addEventListener('click', async () => {
+    presetGrid.querySelectorAll('.preset-btn').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    await captureSound(() => soundMaker.fromPreset(p.id), 'Making sound...');
+  });
+  presetGrid.appendChild(btn);
+});
+
+// Source tabs
+document.querySelectorAll('.sound-tab').forEach((tab) => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.sound-tab').forEach((t) => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.sound-source').forEach((s) => s.classList.add('hidden'));
+    const sourceEl = document.getElementById('sound-source-' + tab.dataset.source);
+    if (sourceEl) sourceEl.classList.remove('hidden');
+    playClick();
+  });
+});
+
+let currentSound = null;
+const soundReadyEl = document.getElementById('sound-ready');
+const soundReadyLabel = document.getElementById('sound-ready-label');
+
+async function captureSound(producer, busyMsg) {
+  try {
+    showToast(busyMsg, 'info');
+    const result = await producer();
+    currentSound = result;
+    soundReadyLabel.textContent = `Sound ready: ${result.label}`;
+    soundReadyEl.classList.remove('hidden');
+    new Audio(result.previewUrl).play().catch(() => {});
+    playSuccess();
+  } catch (err) {
+    playError();
+    showToast(err.message || 'Could not make that sound', 'error');
+  }
+}
+
+document.getElementById('btn-play-preview').addEventListener('click', () => {
+  if (currentSound) new Audio(currentSound.previewUrl).play().catch(() => {});
+});
+
+// Record
+let micController = null;
+const btnRecord = document.getElementById('btn-record');
+const btnStopRecord = document.getElementById('btn-stop-record');
+const recordStatus = document.getElementById('record-status');
+
+btnRecord.addEventListener('click', async () => {
+  try {
+    micController = await soundMaker.startMic();
+    btnRecord.classList.add('hidden');
+    btnStopRecord.classList.remove('hidden');
+    recordStatus.textContent = 'Recording... make your sound!';
+  } catch (err) {
+    playError();
+    showToast(err.message, 'error');
+  }
+});
+
+btnStopRecord.addEventListener('click', async () => {
+  btnStopRecord.classList.add('hidden');
+  btnRecord.classList.remove('hidden');
+  recordStatus.textContent = 'Tap Record and make a sound!';
+  if (!micController) return;
+  const ctrl = micController;
+  micController = null;
+  await captureSound(() => ctrl.stop(), 'Saving recording...');
+});
+
+// Upload + drag/drop
+const soundFileInput = document.getElementById('sound-file');
+const soundDrop = document.getElementById('sound-drop');
+soundFileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) captureSound(() => soundMaker.fromFile(file), 'Loading sound...');
+});
+soundDrop.addEventListener('dragover', (e) => { e.preventDefault(); soundDrop.classList.add('dragover'); });
+soundDrop.addEventListener('dragleave', () => soundDrop.classList.remove('dragover'));
+soundDrop.addEventListener('drop', (e) => {
+  e.preventDefault();
+  soundDrop.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('audio/')) {
+    captureSound(() => soundMaker.fromFile(file), 'Loading sound...');
+  } else {
+    showToast('That is not a sound file', 'error');
+  }
+});
+
+function uniqueSlug(base) {
+  const used = new Set(exporter.getSounds().map((s) => s.slug));
+  let slug = base || 'sound';
+  let n = 2;
+  while (used.has(slug)) slug = `${base}_${n++}`;
+  return slug;
+}
+
+document.getElementById('btn-add-sound').addEventListener('click', () => {
+  if (!currentSound) return;
+  const cfg = FLAT_TRIGGERS[parseInt(triggerSelect.value, 10)];
+  const baseSlug = currentSound.label.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'sound';
+  const slug = uniqueSlug(baseSlug);
+  exporter.addSound({
+    slug,
+    label: currentSound.label,
+    oggBlob: currentSound.oggBlob,
+    kind: cfg.kind,
+    trigger: cfg.trigger,
+    itemId: cfg.itemId,
+    vanillaEvent: cfg.vanillaEvent,
+    triggerLabel: cfg.label,
+  });
+  currentSound = null;
+  soundReadyEl.classList.add('hidden');
+  presetGrid.querySelectorAll('.preset-btn').forEach((b) => b.classList.remove('active'));
+  renderPackSounds();
+  saveSoundsToStorage();
+  playSuccess();
+  burstConfetti(document.getElementById('btn-add-sound'));
+  showToast('Sound added to your pack!', 'success');
+});
+
+const packSoundsEl = document.getElementById('pack-sounds');
+function renderPackSounds() {
+  packSoundsEl.innerHTML = '';
+  exporter.getSounds().forEach((s, index) => {
+    const item = document.createElement('div');
+    item.className = 'pack-sound-item';
+
+    const play = document.createElement('button');
+    play.className = 'pack-sound-play';
+    play.textContent = '▶';
+    play.title = 'Play';
+    play.addEventListener('click', () => {
+      const url = URL.createObjectURL(s.oggBlob);
+      const audio = new Audio(url);
+      audio.addEventListener('ended', () => URL.revokeObjectURL(url));
+      audio.play().catch(() => URL.revokeObjectURL(url));
+    });
+
+    const label = document.createElement('span');
+    label.className = 'pack-sound-label';
+    label.textContent = `${s.label} — ${s.triggerLabel || s.vanillaEvent || s.itemId}`;
+
+    const remove = document.createElement('button');
+    remove.className = 'pack-sound-remove';
+    remove.textContent = '×';
+    remove.title = 'Remove';
+    remove.addEventListener('click', () => {
+      exporter.removeSound(index);
+      renderPackSounds();
+      saveSoundsToStorage();
+      playUndo();
+    });
+
+    item.appendChild(play);
+    item.appendChild(label);
+    item.appendChild(remove);
+    packSoundsEl.appendChild(item);
+  });
+}
+
+// ===== SOUND PERSISTENCE =====
+function blobToDataURL(blob) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.readAsDataURL(blob);
+  });
+}
+async function dataURLToBlob(dataURL) {
+  const resp = await fetch(dataURL);
+  return resp.blob();
+}
+
+async function saveSoundsToStorage() {
+  try {
+    const sounds = await Promise.all(exporter.getSounds().map(async (s) => ({
+      slug: s.slug, label: s.label, kind: s.kind, trigger: s.trigger,
+      itemId: s.itemId, vanillaEvent: s.vanillaEvent, triggerLabel: s.triggerLabel,
+      dataURL: await blobToDataURL(s.oggBlob),
+    })));
+    localStorage.setItem(STORAGE_KEY + '-sounds', JSON.stringify(sounds));
+  } catch (e) {
+    // quota or unavailable — sounds just won't persist
+  }
+}
+
+async function loadSoundsFromStorage() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY + '-sounds'));
+    if (!saved || !saved.length) return;
+    for (const s of saved) {
+      const oggBlob = await dataURLToBlob(s.dataURL);
+      exporter.addSound({ ...s, oggBlob });
+    }
+    renderPackSounds();
+  } catch (e) {
+    // corrupted storage
+  }
+}
+
 // ===== STARTUP =====
 loadFromStorage();
+loadSoundsFromStorage();
 renderPackTextures();
+renderPackSounds();
 updatePreview();
 loadSkinGallery();
 

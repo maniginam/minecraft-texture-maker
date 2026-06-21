@@ -117,6 +117,48 @@
               <select id="texture-target-select"></select>
             </div>
             <button id="btn-add-to-pack" class="action-btn">Add to Pack</button>
+          </div>
+
+          <div class="sound-section">
+            <h3>Add Sounds <span class="sound-beta">new!</span></h3>
+
+            <div class="sound-tabs">
+              <button class="sound-tab active" data-source="presets">Presets</button>
+              <button class="sound-tab" data-source="record">Record</button>
+              <button class="sound-tab" data-source="upload">Upload</button>
+            </div>
+
+            <div class="sound-source" id="sound-source-presets">
+              <div id="preset-grid" class="preset-grid"></div>
+            </div>
+
+            <div class="sound-source hidden" id="sound-source-record">
+              <button id="btn-record" class="action-btn">● Record</button>
+              <button id="btn-stop-record" class="action-btn hidden">■ Stop</button>
+              <div class="sound-hint" id="record-status">Tap Record and make a sound!</div>
+            </div>
+
+            <div class="sound-source hidden" id="sound-source-upload">
+              <label class="sound-drop" id="sound-drop">
+                <input type="file" id="sound-file" accept="audio/*" hidden>
+                Drag a sound here, or tap to pick a file
+              </label>
+            </div>
+
+            <div class="sound-ready hidden" id="sound-ready">
+              <div class="sound-ready-row">
+                <button id="btn-play-preview" class="control-btn" title="Play">▶ Play</button>
+                <span id="sound-ready-label">Sound ready!</span>
+              </div>
+              <label for="sound-trigger-select">When should it play?</label>
+              <select id="sound-trigger-select"></select>
+              <button id="btn-add-sound" class="action-btn">Add Sound to Pack</button>
+            </div>
+
+            <div id="pack-sounds" class="pack-sounds"></div>
+          </div>
+
+          <div class="pack-section">
             <button id="btn-download" class="action-btn download-btn">Download Pack!</button>
           </div>
         </div>

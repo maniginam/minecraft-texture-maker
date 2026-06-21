@@ -28,30 +28,33 @@ Output bundled into the same downloadable zip the app already produces.
 
 The headline feature: "give my sword its own swing sound."
 
-Kid picks: a base item (sword/axe/pickaxe/etc.), a texture they already drew
-(reused from the pack), a trigger action, and a sound.
+Kid picks: a base item TYPE (sword/axe/golden apple/etc.), a trigger action, and
+a sound. The sound binds to the item *type*, matching how the app already
+reskins textures globally (every diamond sword gets the kid's texture, so every
+diamond sword also gets the kid's swing sound). No custom_model_data, no `/give`
+— the kid just uses the normal item. This avoids the 1.21.4→1.21.8 component
+version drift entirely.
 
 App generates:
 - **Resource pack:**
-  - `assets/minecraft/sounds.json` — registers a custom sound event
-    (e.g. `texturemaker.sword_swing`) pointing at the `.ogg`.
-  - `assets/minecraft/sounds/texturemaker/<name>.ogg` — the encoded audio.
-  - Custom item model via `custom_model_data` overriding the base item, pointing
-    at the kid's texture (extends existing item-model handling).
+  - `assets/texturemaker/sounds.json` — registers a custom sound event
+    (e.g. `sword_swing`, referenced as `texturemaker:sword_swing`).
+  - `assets/texturemaker/sounds/<name>.ogg` — the encoded audio.
 - **Datapack** (a separate pack — see Delivery structure below):
-  - An **advancement** with the trigger and an item condition matching the
-    custom item.
-  - A **function** that runs `playsound` for the registered event at the player,
-    then revokes + re-grants the advancement so it can fire again.
-  - A `/give` command card shown in the UI so the kid can spawn the item.
+  - An **advancement** with the trigger (no display ⇒ hidden, no toast).
+  - A reward **function** (`.mcfunction`) that revokes the advancement
+    (so it can re-fire) and runs `playsound texturemaker:<event> player @s`.
 
 **Reliable triggers only:**
-- **Attack a mob (combat):** `minecraft:player_hurt_entity` advancement trigger.
-- **Eat/drink (consume):** `minecraft:consume_item` advancement trigger.
+- **Attack a mob (combat):** `minecraft:player_hurt_entity` advancement fires on
+  any hit; the reward function gates on
+  `execute if items entity @s weapon.mainhand minecraft:<item>` (1.21.2+) so only
+  the chosen weapon type plays the sound.
+- **Eat/drink (consume):** `minecraft:consume_item` advancement with an `item`
+  condition on the chosen food; reward function just revokes + plays.
 
-Mining-a-specific-block and bow-release have no clean per-item advancement
-trigger, so those are delivered as vanilla replacements (mechanism 2), not
-custom-item triggers.
+Mining-a-specific-block and bow-release have no clean advancement trigger, so
+those are delivered as vanilla replacements (mechanism 2).
 
 ### 2. Vanilla sound replacement (resource pack only)
 
@@ -119,10 +122,11 @@ plus the `/give` command(s) to copy.
 - **`js/ogg-encoder.js`** (new) — thin wrapper over the vendored WASM:
   `encodeToOgg(pcmChannels, sampleRate) → Uint8Array`. Single responsibility,
   swappable.
-- **`js/datapack-builder.js`** (new) — pure functions that build the JSON for a
-  custom-item sound: `buildAdvancement(trigger, itemId)`,
-  `buildFunction(soundEvent)`, `buildSoundsJson(entries)`,
-  `buildGiveCommand(item, modelData)`. No I/O, fully unit-testable.
+- **`js/datapack-builder.js`** (new) — pure functions that build the JSON/text
+  for item-type sounds: `slugify`, `buildItemSoundsJson(entries)`,
+  `buildVanillaSoundsJson(entries)`, `buildAttackAdvancement`/`buildAttackFunction`,
+  `buildConsumeAdvancement`/`buildConsumeFunction`, `datapackMcmeta`,
+  `resourceMcmeta`. No I/O, fully unit-testable.
 - **`js/pack-exporter.js`** (changed) — accept sounds + datapack files; write
   `.ogg` files, `sounds.json`, and the `data/` datapack tree into the zip;
   emit `supported_formats` ranges in both `pack.mcmeta` files.
